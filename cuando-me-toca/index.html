@@ -14,6 +14,26 @@
 .tr{font:700 9.5px 'IBM Plex Mono',monospace;text-transform:uppercase;background:#0F4270;color:#fff;border-radius:999px;padding:1px 6px}
 .tp{font:700 9.5px 'IBM Plex Mono',monospace;text-transform:uppercase;color:#9a5b00}
 .tdesc{font-size:13.5px;margin:2px 0 6px}
+.shift.fiesta{background:linear-gradient(90deg,rgba(250,189,18,.18),rgba(250,189,18,.04));border-radius:8px}
+.shift.fiesta .dy{background:#FABD12;color:#231a00;outline:none}
+.shift.fiesta .aname2{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;line-height:1;text-transform:uppercase}
+.shift.fiesta .hrs{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:26px;color:#0F4270}
+.fz{display:block;font-size:12.5px;line-height:1.35;margin-top:5px;color:var(--sub,#5b6878)}
+.cbx{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 4px;padding:10px 12px;border-radius:10px;background:#fff8e6;border:1.5px dashed #c98a1d}
+.cbx .cq{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;color:#7a4a00;margin-right:auto}
+.cb{font:700 15px/1 'Barlow Condensed',sans-serif;letter-spacing:.02em;text-transform:uppercase;padding:11px 16px;border-radius:999px;cursor:pointer;border:2px solid #0F4270;background:#fff;color:#0F4270;min-height:44px}
+.cb.y{background:#1d8a55;border-color:#1d8a55;color:#fff}.cb.n{border-color:#b3261e;color:#b3261e}
+.cb.lnk{border:0;background:none;padding:6px 4px;min-height:0;font-size:13px;text-decoration:underline;color:#56606b;text-transform:none}
+.cb[disabled]{opacity:.5;cursor:wait}
+.cbx.ok{background:#e9f7ef;border:1.5px solid #1d8a55}.cbx.no{background:#fdecea;border:1.5px solid #b3261e}
+.cbx .cs{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;margin-right:auto}.cbx.ok .cs{color:#1d8a55}.cbx.no .cs{color:#b3261e}
+.cbx .wa{font:700 13px 'IBM Plex Mono',monospace;color:#b3261e}
+.shift.no{opacity:.85}.shift.no .dy{background:#b3261e}
+.st.no{color:#b3261e;border:1.4px solid #b3261e;background:#fdecea}
+i.d.no{background:#b3261e}
+.tp.no{background:#fdecea;color:#b3261e}
+.cf.fy{background:#FABD12;color:#231a00;border:1px solid #d9a20a}
+.fiesta-ban{margin:14px 0 6px;padding:10px 14px;border-radius:8px;background:#FFF3CC;border-left:5px solid #FABD12;font-size:14px;color:#231a00}
 .cf.rs{background:#0F4270;color:#fff;border:1px solid #0F4270;margin-right:6px}.cf.ok{background:#dcf3e7;color:#1d8a55;border:1px solid #1d8a55}
 @media (prefers-color-scheme: dark){.shift.asg .hrs{color:#FABD12}}
 .hz{display:block;font-size:13px;line-height:1.35;margin:4px 0 2px;color:var(--ink,#0d1b2a)}.hz b{font-weight:700}.hz small{color:var(--sub,#5b6878);font-size:12px}
@@ -300,6 +320,7 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
   <div class="mxw"><table class="mx"><thead><tr><th scope="col">Nombre</th><th scope="col" class="">Antes<small>previas</small></th><th scope="col" class="">Montaje<small>[A CONFIRMAR]</small></th><th scope="col" class="sab">Viernes<small>6 nov</small></th><th scope="col" class="sab">Sábado mañana<small>7 nov</small></th><th scope="col" class="sab">Sábado tarde<small>7 nov</small></th><th scope="col" class="">Desmontaje<small>[A CONFIRMAR]</small></th></tr></thead><tbody id="mxb"><tr><td colspan="7" style="text-align:center;color:var(--sub);padding:18px">Sin personas todavía · se cargan desde la hoja PERSONAL POR AREA en la fase 2</td></tr></tbody></table></div>
   <div class="legend"><span><i class="d ok"></i>Confirmado</span></div>
  </section>
+ <div class="fiesta-ban"><b>Domingo 8 · 13:00 · Comida final del equipo</b> · Todos los voluntarios estáis invitados a la fiesta final con un menú típico de la tierra. El desmontaje de la mañana es voluntario.</div>
  <section class="blk" id="tarjetas">
   <div class="sh"><h2>Tarjetas por persona</h2><small>orden alfabético</small></div>
   <div class="cards" id="cards"><p class="empty" style="display:block">Sin tarjetas todavía · plantilla en blanco.</p></div>
@@ -508,6 +529,22 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
  var COLS=[['pre','Jueves','5 nov'],['vie','Viernes','6 nov'],['sab','Sábado','7 nov'],['dom','Domingo','8 nov']];
  var ORD={pre:0,vie:1,sab:2,dom:3,all:4}, esc=MB.esc;
  // horario general y tarea de cada área (lo que ve el voluntario; el puesto exacto se concreta con su responsable)
+ // domingo: comida final para todo el equipo (no es un puesto: invitación, no obligatoria)
+ var FIESTA={plato:'menú típico de la tierra (nombre por confirmar)',hora:'13:00',donde:'Pabellón, mesas del tardeo'};
+ var FIESTA_LI='<li class="shift fiesta"><div class="dy"><b>DOM</b><span>8 nov</span></div><div class="tm"><div class="aname2">Comida final del equipo</div><div class="hrs">'+FIESTA.hora+'</div></div><div class="wh"><span class="cg tk">¡Estás invitado/a! La fiesta final para todos: '+esc(FIESTA.plato)+' · '+esc(FIESTA.donde)+'.</span><span class="fz">Por la mañana desmontamos (desde las 08:00): si quieres echar una mano, genial, pero <b>no es obligatorio</b>. A la comida venid todos.</span>'+'{{CB}}'+'</div></li>';
+ var PEND={}, LAST=null;
+ var WA='https://wa.me/34643455398';
+ // caja de confirmación de cada área: el voluntario clica y se guarda en su fila (asig.conf)
+ function cbox(p,k,st,com){if(!p.aid)return '';
+  var b=' data-id="'+esc(p.aid)+'" data-k="'+esc(k)+'"';
+  if(com){
+   if(st==='si')return '<div class="cbx ok"'+b+'><span class="cs">✓ Vienes a comer</span><button type="button" class="cb lnk" data-v="">cambiar</button></div>';
+   if(st==='no')return '<div class="cbx no"'+b+'><span class="cs">No vienes a comer</span><button type="button" class="cb lnk" data-v="">cambiar</button></div>';
+   return '<div class="cbx"'+b+'><span class="cq">¿Vienes a comer?</span><button type="button" class="cb y" data-v="si">Sí, vengo</button><button type="button" class="cb n" data-v="no">No vengo</button></div>';}
+  if(st==='ok')return '<div class="cbx ok"'+b+'><span class="cs">✓ Confirmado</span><button type="button" class="cb lnk" data-v="">cambiar</button></div>';
+  if(st==='no')return '<div class="cbx no"'+b+'><span class="cs">✗ No puedes</span><a class="wa" href="'+WA+'" target="_blank" rel="noopener">Escríbenos y lo cambiamos →</a><button type="button" class="cb lnk" data-v="">cambiar</button></div>';
+  return '<div class="cbx"'+b+'><span class="cq">¿Te va bien esta área?</span><button type="button" class="cb y" data-v="ok">✓ Me va bien</button><button type="button" class="cb n" data-v="no">✗ No puedo</button></div>';}
+ function fiestaLi(p){return FIESTA_LI.replace('{{CB}}',p.aid?cbox(p,'COMIDA|dom',p.cm['COMIDA|dom']||'',1):'<span class="cf fy">Dinos si vienes a comer</span>');}
  var SHORTD={'A12|sab':1,'A22|sab':1};
  var LONG={A01:1,A02:1,A12:1,A15:1,A18:1,A23:1,A06:1,A07:1,A08:1,A14:1,A17:1,A19:1,A20:1,A21:1,A22:1,A24:1,A25:1};
  var HOR={"A23": ["16:00 – 20:00", "Montaje: banderas, arco de meta, parking, sillas y señalética"], "A01": ["08:00 – 20:00", "Check-in: dorsales, welcome pack, tracker y roadbook (abre al público a las 11:00)"], "A02": ["11:00 – 20:00", "Verificaciones técnicas de las motos (montaje desde las 09:30)"], "A03": ["15:00 – 18:00", "Mini Track KTM: recepción y pista"], "A04": ["06:45 – 08:45", "Salida: ordenar boxes y dar la salida"], "A05": ["15:30 – 18:45", "Llegada: trackers, medallas y podium"], "A06": ["10:00 – 19:30", "Zona Expo: montaje y control de stands"], "A07": ["08:00 – 17:45", "Control de paso y avituallamiento"], "A08": ["08:30 – 17:30", "Control de paso y avituallamiento"], "A09": ["08:00 – 13:00", "Desmontaje y limpieza (después, comida final del equipo)"], "A10": ["06:15 – 10:00", "CP On-Road 1 en Almudévar (salida de Fraga a las 06:15)"], "A11": ["11:30 – 14:00", "CP On-Road 2 en Arguis"], "A12": ["11:00 – 19:30", "Parking de motos"], "A13": ["18:00 – 21:00", "Briefing: control AV y sala"], "A14": ["07:00 – 23:00", "Foto, vídeo, dron y redes"], "A15": ["15:30 – 23:30", "Montaje de mesas, cena final y tardeo"], "A17": ["05:00 – 20:00", "Centro de mando, almacén y logística"], "A18": ["21:00 – 08:00", "Vigilancia, accesos y custodia"], "A19": ["07:30 – 17:30", "Marshal en ruta Off-Road (punto de vigilancia)"], "A20": ["09:00 – 17:30", "Equipo médico en ruta"], "A21": ["07:00 – 17:00", "Marshal en ruta On-Road"], "A16": ["Por definir", "Post-evento y cierre de edición"], "A22": ["10:00 – 21:30", "Zona de descanso del staff: café, agua, bocatas y bolsas de comida"], "A24": ["07:50 – 16:00", "Marshal de gasolinera: ordenar la cola (salida de Base a las 07:50)"], "A25": ["09:40 – 17:30", "Marshal de gasolinera: ordenar la cola (salida de Base a las 09:40)"]};
@@ -520,8 +557,11 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
   var EXTRA={A22:'Zona Staff y Descanso',A23:'Montaje del jueves',A24:'Gasolinera de Sena',A25:'Gasolinera de Mequinenza'};
   Object.keys(EXTRA).forEach(function(c){if(!A[c])A[c]={c:c,n:EXTRA[c],r:'',g:''};});
   var P={};
-  function person(n){var k=MB.slug(n);return P[k]=P[k]||{id:k,nombre:n,items:[],conf:true};}
-  (d.people||[]).forEach(function(v){var x=person(v.nombre);if(!v.confirmado)x.conf=false;v.items.forEach(function(i){x.items.push({area:i.area,dia:i.dia,conf:v.confirmado});});});
+  function person(n){var k=MB.slug(n);return P[k]=P[k]||{id:k,nombre:n,items:[],cm:{}};}
+  // confirmación por área (27/10): cada voluntario confirma cada puesto; conf = {"A19|sab":"ok"|"no","COMIDA|dom":"si"|"no"}
+  (d.people||[]).forEach(function(v){var x=person(v.nombre),c=v.conf||{};if(typeof c==='string'){try{c=JSON.parse(c||'{}');}catch(e){c={};}}
+   Object.keys(PEND).forEach(function(k){var q=k.split('~');if(q[0]===v.id)c[q[1]]=PEND[k];});
+   x.aid=v.id;x.cm=c;v.items.forEach(function(i){var st=c[i.area+'|'+i.dia]||(v.confirmado?'ok':'');x.items.push({area:i.area,dia:i.dia,st:st,conf:st==='ok'});});});
   // responsables: si ya está como voluntario (mismo nombre o parecido: «Cesc Piñol» = «Cesc Piñol Piñol»), una sola tarjeta
   function dist(a,b){var m=a.length,n=b.length,d=[],x,y;for(x=0;x<=m;x++){d[x]=[x];}for(y=0;y<=n;y++)d[0][y]=y;for(x=1;x<=m;x++)for(y=1;y<=n;y++)d[x][y]=Math.min(d[x-1][y]+1,d[x][y-1]+1,d[x-1][y-1]+(a[x-1]===b[y-1]?0:1));return d[m][n];}
   function match(n){var k=MB.slug(n);if(P[k])return P[k];var t=k.split('-');
@@ -543,21 +583,22 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
    return '<tr data-n="'+esc(p.nombre)+'"><th scope="row"><a href="#'+p.id+'">'+esc(p.nombre)+'</a></th>'+COLS.map(function(c){
     var it=p.items.filter(function(i){return i.dia===c[0]||i.dia==='all';});
     if(!it.length) return '<td class="'+(c[0]==='vie'||c[0]==='sab'?'sab':'')+'"></td>';
-    var ok=it.some(function(i){return i.resp||i.conf;});
-    return '<td class="'+(c[0]==='vie'||c[0]==='sab'?'sab':'')+'" title="'+esc(it.map(function(i){return i.area;}).join(', '))+'"><i class="d '+(ok?'ok':'pd')+'"></i></td>';}).join('')+'</tr>';}).join('')
+    var no=it.some(function(i){return i.st==='no';}),ok=it.every(function(i){return i.resp||i.conf;});
+    return '<td class="'+(c[0]==='vie'||c[0]==='sab'?'sab':'')+'" title="'+esc(it.map(function(i){return i.area;}).join(', '))+'"><i class="d '+(no?'no':ok?'ok':'pd')+'"></i></td>';}).join('')+'</tr>';}).join('')
    :'<tr><td colspan="5" style="text-align:center;color:var(--sub);padding:18px">Todavía no hay nadie asignado.</td></tr>';
-  document.querySelector('.legend').innerHTML='<span><i class="d ok"></i>Confirmado</span><span><i class="d pd"></i>Asignado, por confirmar</span>';
+  document.querySelector('.legend').innerHTML='<span><i class="d ok"></i>Confirmado</span><span><i class="d pd"></i>Asignado, por confirmar</span><span><i class="d no"></i>No puede</span>';
   // quién está en cada área (para «Ver equipo»)
   window.MBAREA={A:A,by:{}};
-  L.forEach(function(p){p.items.forEach(function(i){var k=i.area;(MBAREA.by[k]=MBAREA.by[k]||[]).push({n:p.nombre,id:p.id,d:i.dia,r:!!(i.resp||i.resp2),c:!!(i.resp||i.conf)});});});
+  L.forEach(function(p){p.items.forEach(function(i){var k=i.area;(MBAREA.by[k]=MBAREA.by[k]||[]).push({n:p.nombre,id:p.id,d:i.dia,r:!!(i.resp||i.resp2),c:!!(i.resp||i.conf),no:i.st==='no'});});});
   document.getElementById('cards').innerHTML=L.length?L.map(function(p){
    var its=p.items.slice().sort(function(a,b){return ORD[a.dia]-ORD[b.dia]||a.area.localeCompare(b.area);});
-   var allOk=its.every(function(i){return i.resp||i.conf;});
-   return '<article class="card" id="'+p.id+'" data-n="'+esc(p.nombre)+'"><header><h3>'+esc(p.nombre)+'</h3><span class="st '+(allOk?'ok':'pend')+'">'+(allOk?'Confirmado':'Por confirmar')+'</span></header><ol>'+
-    its.map(function(i){var a=A[i.area]||{n:i.area,g:''},dd=DAY[i.dia]||['—',''],pend=!(i.resp||i.conf);
+   var vol=its.filter(function(i){return !i.resp;}),nOk=vol.filter(function(i){return i.conf;}).length,nNo=vol.filter(function(i){return i.st==='no';}).length;
+   var stc=nNo?'no':(nOk===vol.length?'ok':'pend'),stt=!vol.length?'Responsable':nNo?(nNo===1?'1 área que no puedes':nNo+' áreas que no puedes'):nOk===vol.length?'Todo confirmado':(nOk?nOk+' de '+vol.length+' confirmadas':'Por confirmar');
+   return '<article class="card" id="'+p.id+'" data-n="'+esc(p.nombre)+'"><header><h3>'+esc(p.nombre)+'</h3><span class="st '+stc+'">'+stt+'</span></header><ol>'+
+    its.map(function(i){var a=A[i.area]||{n:i.area,g:''},dd=DAY[i.dia]||['—',''],pend=!(i.resp||i.conf)&&i.st!=='no';
      var H=HOR[i.area]; if(!H) return '<li class="shift'+(pend?' pend':'')+'"><div class="dy"><b>'+dd[0]+'</b><span>'+dd[1]+'</span></div><div class="tm"><div class="time word tbc">'+(i.dia==='all'?'Todo el evento':'Hora por confirmar')+'</div></div>'+'<div class="wh"><span class="ar">'+esc(i.area)+' · '+esc(a.n)+'</span><span class="cg">'+(i.resp?'Responsable del área':'Voluntario')+'</span>'+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';
-     return '<li class="shift asg'+(pend?' pend':'')+'"><div class="dy"><b>'+dd[0]+'</b><span>'+dd[1]+'</span></div><div class="tm"><button type="button" class="aname2 aopen" data-area="'+esc(i.area)+'" title="Ver quién está en esta área">'+esc(a.n)+' <span class="aw">Ver equipo →</span></button><div class="hrs">'+esc(hrsOf(i))+'</div></div>'+
-      '<div class="wh"><span class="cg tk">'+esc(H[1])+'</span>'+(i.resp||i.resp2?'<span class="cf rs">Responsable del área</span>':'')+(!i.resp&&!i.resp2&&LONG[i.area]&&!SHORTD[i.area+'|'+i.dia]?'<span class="rot"><b class="rk">Son muchas horas.</b> Cuando tengamos a todo el equipo disponible y confirmado, el responsable del área repartirá <b>turnos y rotaciones</b>.</span>':'')+'<span class="ar">'+esc(i.area)+'</span>'+(i.resp?'':(pend?'<span class="cf">Pendiente · revísalo y dinos si puedes</span>':'<span class="cf ok">Confirmado</span>'))+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';}).join('')+'</ol></article>';}).join('')
+     return '<li class="shift asg'+(pend?' pend':'')+(i.st==='no'?' no':'')+'"><div class="dy"><b>'+dd[0]+'</b><span>'+dd[1]+'</span></div><div class="tm"><button type="button" class="aname2 aopen" data-area="'+esc(i.area)+'" title="Ver quién está en esta área">'+esc(a.n)+' <span class="aw">Ver equipo →</span></button><div class="hrs">'+esc(hrsOf(i))+'</div></div>'+
+      '<div class="wh"><span class="cg tk">'+esc(H[1])+'</span>'+(i.resp||i.resp2?'<span class="cf rs">Responsable del área</span>':'')+(!i.resp&&!i.resp2&&LONG[i.area]&&!SHORTD[i.area+'|'+i.dia]?'<span class="rot"><b class="rk">Son muchas horas.</b> Cuando tengamos a todo el equipo disponible y confirmado, el responsable del área repartirá <b>turnos y rotaciones</b>.</span>':'')+'<span class="ar">'+esc(i.area)+'</span>'+(i.resp?'':cbox(p,i.area+'|'+i.dia,i.st,0))+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';}).join('')+fiestaLi(p)+'</ol></article>';}).join('')
    :'<p class="empty" style="display:block">Todavía no hay nadie asignado.</p>';
   if(window.MBsearch) window.MBsearch();
   var lv=document.getElementById('live'); if(lv) lv.textContent='en vivo · '+MB.hm(d.ts);
@@ -567,14 +608,23 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
   var days=['pre','vie','sab','dom'].filter(function(d){return L.some(function(x){return x.d===d;});});
   var h='';days.forEach(function(d){var g=L.filter(function(x){return x.d===d;}).sort(function(x,y){return (y.r-x.r)||x.n.localeCompare(y.n,'es');});
    var dd=DAY[d]||['',''],hr=HOR[c]?(HORD[c+'|'+d]||HOR[c][0]):'';
-   h+='<div class="tg"><div class="tgh"><b>'+dd[0]+' '+dd[1]+'</b>'+(hr?' · '+esc(hr):'')+'<span>'+g.length+' persona'+(g.length===1?'':'s')+'</span></div><ul class="tl2">'+g.map(function(x){return '<li><a href="#'+x.id+'" class="tn">'+esc(x.n)+'</a>'+(x.r?'<span class="tr">Responsable</span>':'')+(x.c?'':'<span class="tp">por confirmar</span>')+'</li>';}).join('')+'</ul></div>';});
+   h+='<div class="tg"><div class="tgh"><b>'+dd[0]+' '+dd[1]+'</b>'+(hr?' · '+esc(hr):'')+'<span>'+g.length+' persona'+(g.length===1?'':'s')+'</span></div><ul class="tl2">'+g.map(function(x){return '<li><a href="#'+x.id+'" class="tn">'+esc(x.n)+'</a>'+(x.r?'<span class="tr">Responsable</span>':'')+(x.c?'':x.no?'<span class="tp no">no puede</span>':'<span class="tp">por confirmar</span>')+'</li>';}).join('')+'</ul></div>';});
   document.getElementById('detk').textContent=c+' · equipo del área';document.getElementById('dett').textContent=a.n;
   document.getElementById('detb').innerHTML=(HOR[c]?'<p class="tdesc">'+esc(HOR[c][1])+'</p>':'')+(h||'<p class="tdesc">Todavía no hay nadie en esta área.</p>');
   var dl=document.getElementById('det');dl.hidden=false;document.getElementById('detx').focus();});
  document.getElementById('det').addEventListener('click',function(e){var a=e.target.closest('a.tn');if(a){document.getElementById('det').hidden=true;}});
+ document.addEventListener('click',async function(e){var b=e.target.closest('.cbx .cb');if(!b)return;e.preventDefault();
+  var box=b.closest('.cbx'),id=box.dataset.id,k=box.dataset.k,v=b.dataset.v,pk=id+'~'+k;
+  box.querySelectorAll('.cb').forEach(function(x){x.disabled=true;});
+  PEND[pk]=v; if(LAST) build(LAST);
+  try{ await MB.call('asig.conf',{id:id,k:k,v:v});
+   (LAST.people||[]).forEach(function(q){if(q.id===id){var c=q.conf||{};if(typeof c==='string'){try{c=JSON.parse(c||'{}');}catch(_){c={};}}if(v)c[k]=v;else delete c[k];q.conf=c;}});
+   delete PEND[pk]; build(LAST); if(MB.toast) MB.toast(v==='ok'||v==='si'?'¡Gracias! Guardado':v==='no'?'Guardado · te escribiremos':'Respuesta borrada');
+  }catch(err){ delete PEND[pk]; if(LAST) build(LAST); if(MB.toast) MB.toast('No se ha podido guardar. Prueba otra vez.'); }
+ });
  var busy=false;
  async function load(){ if(busy) return; busy=true;
-  try{ build(await MB.call('tablon')); }
+  try{ LAST=await MB.call('tablon'); build(LAST); }
   catch(e){ if(e.code==='clave'){MB.logout();return;} var lv=document.getElementById('live'); if(lv) lv.textContent='sin conexión'; }
   finally{busy=false;} }
  MB.gate({need:'any',title:'¿Cuándo me toca?',label:'Clave de voluntarios'}).then(function(){ load(); MB.poll(load,60000); });
