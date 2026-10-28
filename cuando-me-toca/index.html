@@ -326,7 +326,7 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
  </nav>
  <div class="panel" data-panel="personas">
  <div class="find"><label for="q">Tu nombre</label><input id="q" type="search" placeholder="Ej.: Xavi" autocomplete="off"><span class="cnt" id="cnt">0 personas</span></div>
- <details class="eqa" id="eqa"><summary>Equipos por área<small>revisión · toca un área</small></summary><div class="eqb" id="eqb"></div></details>
+ <details class="eqa" id="eqa" hidden><summary>Equipos por área<small>revisión · toca un área</small></summary><div class="eqb" id="eqb"></div></details>
  <section class="blk" id="vista">
   <div class="sh"><h2>Quién está cuándo</h2><small>toca un nombre para ir a su tarjeta</small></div>
   <div class="mxw"><table class="mx"><thead><tr><th scope="col">Nombre</th><th scope="col" class="">Antes<small>previas</small></th><th scope="col" class="">Montaje<small>[A CONFIRMAR]</small></th><th scope="col" class="sab">Viernes<small>6 nov</small></th><th scope="col" class="sab">Sábado mañana<small>7 nov</small></th><th scope="col" class="sab">Sábado tarde<small>7 nov</small></th><th scope="col" class="">Desmontaje<small>[A CONFIRMAR]</small></th></tr></thead><tbody id="mxb"><tr><td colspan="7" style="text-align:center;color:var(--sub);padding:18px">Sin personas todavía · se cargan desde la hoja PERSONAL POR AREA en la fase 2</td></tr></tbody></table></div>
@@ -372,7 +372,7 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
   <div class="row"><button type="button" id="cx">Cancelar</button><button type="submit" class="pri">Abrir</button></div></form>
   <div id="ok" hidden><div class="list" id="lst"></div><p class="hint">Queda abierto solo mientras tengas esta página abierta. Al cerrarla o recargarla se vuelve a bloquear.</p><div class="row"><button type="button" id="cx2">Cerrar</button></div></div>
  </div></div>
- <div class="foot"><span>MonegrosBook · Tablón del equipo · rev. plantilla v1 · 24/09/2026</span><span>Operado por XG Concept</span></div>
+ <div class="foot"><span>MonegrosBook · Tablón del equipo · rev. plantilla v1 · 24/09/2026</span><span>Operado por XG Concept <button type="button" id="orgk" aria-label="Organización" style="all:unset;cursor:pointer;opacity:.35;padding:0 4px">·</button></span></div>
 </main>
 <script>
 (function(){
@@ -610,7 +610,7 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
     var M=MBAREA.by[c]||[],seen={},vol=0,ok=0,no=0,rs=[];M.forEach(function(x){if(x.r&&rs.indexOf(x.n)<0)rs.push(x.n);if(x.r&&!M.some(function(y){return y.n===x.n&&!y.r;}))return;var k=x.n+'|'+x.d;if(seen[k])return;seen[k]=1;vol++;if(x.c)ok++;if(x.no)no++;});
     var ppl={};M.forEach(function(x){ppl[x.n]=1;});var np=Object.keys(ppl).length;
     return '<button type="button" class="aopen'+(np?'':' z')+'" data-area="'+c+'"><span class="ec">'+c+'</span><span class="en">'+esc((A[c]||{}).n||S.areas[c][0])+'</span><span class="ex">'+(np?np+' · <span class="y">'+ok+'✓</span>'+(no?' <span class="r">'+no+'✗</span>':''):'vacía')+'</span></button>';}).join('')+'</div></div>';}).join('');
-   try{var eq=document.getElementById('eqa');if(localStorage.getItem('mb_eqa')==='1')eq.open=true;if(!eq.dataset.b){eq.dataset.b=1;eq.addEventListener('toggle',function(){try{localStorage.setItem('mb_eqa',eq.open?'1':'0');}catch(_){}});}}catch(_){}}
+   try{var eq=document.getElementById('eqa');if(localStorage.getItem('mb_eqa')==='1'&&!eq.hidden)eq.open=true;if(!eq.dataset.b){eq.dataset.b=1;eq.addEventListener('toggle',function(){try{localStorage.setItem('mb_eqa',eq.open?'1':'0');}catch(_){}});}}catch(_){}}
   document.getElementById('cards').innerHTML=L.length?L.map(function(p){
    var its=p.items.slice().sort(function(a,b){return ORD[a.dia]-ORD[b.dia]||a.area.localeCompare(b.area);});
    var vol=its.filter(function(i){return !i.resp;}),nOk=vol.filter(function(i){return i.conf;}).length,nNo=vol.filter(function(i){return i.st==='no';}).length;
@@ -648,7 +648,13 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
   try{ LAST=await MB.call('tablon'); build(LAST); }
   catch(e){ if(e.code==='clave'){MB.logout();return;} var lv=document.getElementById('live'); if(lv) lv.textContent='sin conexión'; }
   finally{busy=false;} }
- MB.gate({need:'any',title:'¿Cuándo me toca?',label:'Clave de voluntarios'}).then(function(){ load(); MB.poll(load,60000); });
+ // «Equipos por área» solo para la organización: con la clave de gestión, o tocando el punto discreto del pie y poniéndola
+ function showEq(){var e=document.getElementById('eqa');if(!e)return;e.hidden=false;try{if(localStorage.getItem('mb_eqa')==='1')e.open=true;}catch(_){}}
+ document.getElementById('orgk').addEventListener('click',async function(){
+  var k=window.prompt('Clave de organización');if(!k)return;var old='';try{old=localStorage.getItem('mb_key')||'';localStorage.setItem('mb_key',k);}catch(_){}
+  try{var j=await MB.call('login');if(j.role==='gestion'){showEq();var e=document.getElementById('eqa');e.open=true;e.scrollIntoView({behavior:'smooth'});return;}}catch(_){}
+  try{localStorage.setItem('mb_key',old);}catch(_){} if(MB.toast)MB.toast('Clave incorrecta');});
+ MB.gate({need:'any',title:'¿Cuándo me toca?',label:'Clave de voluntarios'}).then(function(role){ if(role==='gestion') showEq(); load(); MB.poll(load,60000); });
 })();
 </script>
 
