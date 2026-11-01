@@ -1,0 +1,435 @@
+{
+ "v": "2026-11-01",
+ "nota": "Fuente única de áreas y horarios. La edita Claude; la leen Voluntarios y ¿Cuándo me toca?",
+ "areas": {
+  "A01": {
+   "n": "Inscripciones / Check-in",
+   "s": "Check-in",
+   "r": "Laia Galindo",
+   "g": "pilotos",
+   "dia": "vie",
+   "dias": [
+    "vie"
+   ],
+   "hor": {
+    "vie": "08:00 – 20:00"
+   },
+   "tarea": "Check-in: dorsales, welcome pack, tracker y roadbook (abre al público a las 11:00)",
+   "largo": true,
+   "cortos": []
+  },
+  "A02": {
+   "n": "Verificaciones Técnicas (Paddock)",
+   "s": "Verificaciones",
+   "r": "Josep Piñol",
+   "g": "pilotos",
+   "dia": "vie",
+   "dias": [
+    "vie"
+   ],
+   "hor": {
+    "vie": "11:00 – 20:00"
+   },
+   "tarea": "Verificaciones técnicas de las motos (montaje desde las 09:30)",
+   "largo": true,
+   "cortos": []
+  },
+  "A03": {
+   "n": "Mini Track",
+   "s": "Mini Track",
+   "r": "Cesc Piñol",
+   "g": "ambiente",
+   "dia": "vie",
+   "dias": [
+    "vie"
+   ],
+   "hor": {
+    "vie": "15:00 – 18:00"
+   },
+   "tarea": "Mini Track KTM: recepción y pista",
+   "largo": false,
+   "cortos": []
+  },
+  "A04": {
+   "n": "Zona de Salida (Arco de Meta)",
+   "s": "Salida",
+   "r": "Jordi Viladoms",
+   "g": "pilotos",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "06:45 – 08:45"
+   },
+   "tarea": "Salida: ordenar boxes y dar la salida",
+   "largo": false,
+   "cortos": []
+  },
+  "A05": {
+   "n": "Llegada y Podium Finisher",
+   "s": "Llegada",
+   "r": "Laia Galindo",
+   "g": "ambiente",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "15:30 – 18:45"
+   },
+   "tarea": "Llegada: trackers, medallas y podium",
+   "largo": false,
+   "cortos": []
+  },
+  "A06": {
+   "n": "Zona Expo / Comercial",
+   "s": "Expo",
+   "r": "Xavi Francés",
+   "g": "ambiente",
+   "dia": "vie",
+   "dias": [
+    "vie"
+   ],
+   "hor": {
+    "vie": "10:00 – 19:30"
+   },
+   "tarea": "Zona Expo: montaje y control de stands",
+   "largo": true,
+   "cortos": []
+  },
+  "A07": {
+   "n": "Avituallamiento / CP Monegros Festival",
+   "s": "CP Festival",
+   "r": "Josep Piñol",
+   "g": "ruta",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "08:00 – 17:45"
+   },
+   "tarea": "Control de paso y avituallamiento",
+   "largo": true,
+   "cortos": []
+  },
+  "A08": {
+   "n": "CP Mequinenza (Avituallamiento Plaza)",
+   "s": "CP Mequinenza",
+   "r": "Jordi Larregola",
+   "g": "ruta",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "08:30 – 17:30"
+   },
+   "tarea": "Control de paso y avituallamiento",
+   "largo": true,
+   "cortos": []
+  },
+  "A09": {
+   "n": "Desmontaje y Limpieza Final",
+   "s": "Desmontaje",
+   "r": "Xavi Galindo",
+   "g": "servicios",
+   "dia": "dom",
+   "dias": [
+    "dom"
+   ],
+   "hor": {
+    "dom": "08:00 – 13:00"
+   },
+   "tarea": "Desmontaje y limpieza (después, comida final del equipo)",
+   "largo": false,
+   "cortos": []
+  },
+  "A10": {
+   "n": "CP On-Road 1 (Almudévar)",
+   "s": "CP OnRoad 1",
+   "r": "Rosa Arbones",
+   "g": "ruta",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "06:15 – 10:00"
+   },
+   "tarea": "CP On-Road 1 en Almudévar (salida de Fraga a las 06:15)",
+   "largo": false,
+   "cortos": []
+  },
+  "A11": {
+   "n": "CP On-Road 2 (Arguis)",
+   "s": "CP OnRoad 2",
+   "r": "Benito Galindo",
+   "g": "ruta",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "11:30 – 14:00"
+   },
+   "tarea": "CP On-Road 2 en Arguis",
+   "largo": false,
+   "cortos": []
+  },
+  "A12": {
+   "n": "Parking Motos (Paddock)",
+   "s": "Parking",
+   "r": "Sergio",
+   "g": "pilotos",
+   "dia": "vie",
+   "dias": [
+    "vie",
+    "sab"
+   ],
+   "hor": {
+    "vie": "11:00 – 19:30",
+    "sab": "06:30 – 09:00"
+   },
+   "tarea": "Parking de motos",
+   "largo": true,
+   "cortos": [
+    "sab"
+   ]
+  },
+  "A13": {
+   "n": "Briefing / Presentación Oficial",
+   "s": "Briefing",
+   "r": "Xavi Galindo",
+   "g": "direccion",
+   "dia": "sab",
+   "dias": [
+    "jue",
+    "vie"
+   ],
+   "hor": {
+    "pre": "18:00 – 21:00",
+    "vie": "18:00 – 21:00"
+   },
+   "tarea": "Briefing: control AV y sala",
+   "largo": false,
+   "cortos": []
+  },
+  "A14": {
+   "n": "Media, Redes Sociales y Contenido «Inside»",
+   "s": "Media",
+   "r": "Noemí Larregola",
+   "g": "ambiente",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "07:00 – 23:00"
+   },
+   "tarea": "Foto, vídeo, dron y redes",
+   "largo": true,
+   "cortos": []
+  },
+  "A15": {
+   "n": "Cena Final y Tardeo (Foodtrucks)",
+   "s": "Cena",
+   "r": "Laia Galindo",
+   "g": "ambiente",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "15:30 – 23:30"
+   },
+   "tarea": "Montaje de mesas, cena final y tardeo",
+   "largo": true,
+   "cortos": []
+  },
+  "A16": {
+   "n": "Post-Evento y Cierre de Edición",
+   "s": "Post-evento",
+   "r": "Xavi Galindo",
+   "g": "direccion",
+   "dia": "dom",
+   "dias": [
+    "dom"
+   ],
+   "hor": {},
+   "tarea": "",
+   "largo": false,
+   "cortos": []
+  },
+  "A17": {
+   "n": "Centro de Mando (HQ/PCO) y Logística Interna",
+   "s": "HQ / PCO",
+   "r": "Jordi Viladoms",
+   "g": "direccion",
+   "dia": "sab",
+   "dias": [
+    "vie",
+    "sab"
+   ],
+   "hor": {
+    "vie": "08:00 – 23:00",
+    "sab": "05:00 – 20:00"
+   },
+   "tarea": "Centro de mando, almacén y logística",
+   "largo": true,
+   "cortos": []
+  },
+  "A18": {
+   "n": "Vigilancia y Seguridad",
+   "s": "Seguridad",
+   "r": "Xavi Galindo",
+   "g": "direccion",
+   "dia": "sab",
+   "dias": [
+    "vie",
+    "sab"
+   ],
+   "hor": {
+    "vie": "21:00 – 08:00",
+    "sab": "21:00 – 08:00"
+   },
+   "tarea": "Vigilancia, accesos y custodia",
+   "largo": true,
+   "cortos": []
+  },
+  "A19": {
+   "n": "Ruta Off-Road",
+   "s": "Ruta Off",
+   "r": "Jordi Viladoms",
+   "g": "ruta",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "07:30 – 17:30"
+   },
+   "tarea": "Marshal en ruta Off-Road (punto de vigilancia)",
+   "largo": true,
+   "cortos": []
+  },
+  "A20": {
+   "n": "Equipo Médico",
+   "s": "Médico",
+   "r": "Anna Comesolives",
+   "g": "servicios",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "09:00 – 17:30"
+   },
+   "tarea": "Equipo médico en ruta",
+   "largo": true,
+   "cortos": []
+  },
+  "A21": {
+   "n": "Ruta On-Road",
+   "s": "Ruta On",
+   "r": "Jordi Viladoms",
+   "g": "ruta",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "07:00 – 17:00"
+   },
+   "tarea": "Marshal en ruta On-Road",
+   "largo": true,
+   "cortos": []
+  },
+  "A22": {
+   "n": "Zona Staff y Descanso",
+   "s": "Zona Staff",
+   "r": "Rosa Arbonés",
+   "g": "servicios",
+   "dia": "vie",
+   "dias": [
+    "vie",
+    "sab",
+    "dom"
+   ],
+   "hor": {
+    "vie": "10:00 – 21:30",
+    "sab": "05:00 – 07:00",
+    "dom": "08:00 – 16:00"
+   },
+   "tarea": "Zona de descanso del staff: café, agua, bocatas y bolsas de comida",
+   "largo": true,
+   "cortos": [
+    "sab"
+   ]
+  },
+  "A23": {
+   "n": "Montaje del jueves",
+   "s": "Montaje jue",
+   "r": "Xavi Galindo",
+   "g": "pilotos",
+   "dia": "pre",
+   "dias": [
+    "pre"
+   ],
+   "hor": {
+    "pre": "16:00 – 20:00"
+   },
+   "tarea": "Montaje: banderas, arco de meta, parking, sillas y señalética",
+   "largo": true,
+   "cortos": []
+  },
+  "A24": {
+   "n": "Gasolinera de Sena",
+   "s": "Gasol. Sena",
+   "r": "Xavi Galindo",
+   "g": "ruta",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "07:50 – 16:00"
+   },
+   "tarea": "Marshal de gasolinera: ordenar la cola (salida de Base a las 07:50)",
+   "largo": true,
+   "cortos": []
+  },
+  "A25": {
+   "n": "Gasolinera de Mequinenza",
+   "s": "Gasol. Mequinenza",
+   "r": "Xavi Galindo",
+   "g": "ruta",
+   "dia": "sab",
+   "dias": [
+    "sab"
+   ],
+   "hor": {
+    "sab": "09:40 – 17:30"
+   },
+   "tarea": "Marshal de gasolinera: ordenar la cola (salida de Base a las 09:40)",
+   "largo": true,
+   "cortos": []
+  },
+  "A26": {
+   "n": "Flujos (accesos y tráfico)",
+   "s": "Flujos",
+   "r": "Xavier Torres",
+   "g": "direccion",
+   "dia": "sab",
+   "dias": [
+    "vie",
+    "sab"
+   ],
+   "hor": {},
+   "tarea": "Flujos de acceso: rotonda, acceso Expo y VIP, parking de coches",
+   "largo": false,
+   "cortos": []
+  }
+ }
+}
