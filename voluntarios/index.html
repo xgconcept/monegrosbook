@@ -152,6 +152,18 @@ button.kpi:hover{border-color:var(--blue)}
 .aitem.conf::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok);align-self:center;margin-right:-2px}
 .aitem .nm{flex:1}
 .aempty{font-size:12px;color:var(--terra);font-weight:600}
+.arm{all:unset;cursor:pointer;color:var(--sub);font-size:15px;line-height:1;padding:0 4px}
+.arm:hover,.arm:focus-visible{color:var(--terra)}
+.aadd{all:unset;cursor:pointer;box-sizing:border-box;text-align:center;font-size:12px;font-weight:700;border:1px dashed var(--hair);border-radius:6px;padding:6px;color:var(--sub)}
+.aadd:hover,.aadd:focus-visible{border-color:var(--ink);color:var(--ink)}
+.aform{display:flex;flex-direction:column;gap:6px;border-top:1px dashed var(--hair);padding-top:6px}
+.aform select{font-size:14px;padding:6px;border-radius:6px;border:1px solid var(--hair);background:var(--panel);color:inherit;max-width:100%}
+.aformb{display:flex;gap:6px}
+.unbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 10px}
+.unk{font-size:12px;color:var(--sub)}
+.unlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px;margin:0 0 14px}
+.unit{display:flex;flex-direction:column;gap:2px;border:1px solid var(--hair);border-radius:8px;padding:8px 10px;font-size:12.5px;background:var(--panel)}
+.unit b{font-size:13.5px}.unit span{color:var(--sub)}.unit .sug{color:var(--ink)}
 .acons{font-size:11.5px;color:var(--sub);border-top:1px dashed var(--hair);padding-top:6px}
 .acons .lab{font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:10px}
 .empty-state{padding:30px;text-align:center;color:var(--sub);background:var(--panel);border:1px dashed var(--hair);border-radius:10px}
@@ -209,10 +221,12 @@ const AREAS=[
 ["A10","Control de Paso (CP) OnRoad Rápido","Rosa Arbones"],["A11","CP OnRoad Rápido · CP OnRoad 2","Benito Galindo"],["A12","Parking Motos (Paddock)","Sergio"],
 ["A13","Briefing / Presentación Oficial","Xavi Galindo"],["A14","Media, Redes Sociales y Contenido «Inside»","Noemí Larregola"],["A15","Cena Final y Tardeo (Foodtrucks)","Laia Galindo"],
 ["A16","Post-Evento y Cierre de Edición","Xavi Galindo"],["A17","Centro de Mando (HQ/PCO) y Logística Interna","Jordi Viladoms"],["A18","Vigilancia y Seguridad","Xavi Galindo"],
-["A19","Ruta Off-Road","Jordi Viladoms"],["A20","Equipo Médico","Anna Comesolives"],["A21","Ruta On-Road","Jordi Viladoms"]];
-const SHORT={A01:"Check-in",A02:"Verificaciones",A03:"Mini Track",A04:"Salida",A05:"Llegada",A06:"Expo",A07:"CP Festival",A08:"CP Mequinenza",A09:"Desmontaje",A10:"CP OnRoad 1",A11:"CP OnRoad 2",A12:"Parking",A13:"Briefing",A14:"Media",A15:"Cena",A16:"Post-evento",A17:"HQ / PCO",A18:"Seguridad",A19:"Ruta Off",A20:"Médico",A21:"Ruta On"};
+["A19","Ruta Off-Road","Jordi Viladoms"],["A20","Equipo Médico","Anna Comesolives"],["A21","Ruta On-Road","Jordi Viladoms"],
+["A22","Zona Staff y Descanso",""],["A23","Montaje del jueves",""],["A24","Gasolinera de Sena",""],["A25","Gasolinera de Mequinenza",""]];
+const SHORT={A22:"Zona Staff",A23:"Montaje jue",A24:"Gasol. Sena",A25:"Gasol. Mequinenza",A01:"Check-in",A02:"Verificaciones",A03:"Mini Track",A04:"Salida",A05:"Llegada",A06:"Expo",A07:"CP Festival",A08:"CP Mequinenza",A09:"Desmontaje",A10:"CP OnRoad 1",A11:"CP OnRoad 2",A12:"Parking",A13:"Briefing",A14:"Media",A15:"Cena",A16:"Post-evento",A17:"HQ / PCO",A18:"Seguridad",A19:"Ruta Off",A20:"Médico",A21:"Ruta On"};
 const AREA=Object.fromEntries(AREAS.map(a=>[a[0],{c:a[0],n:a[1],r:a[2],s:SHORT[a[0]]}]));
 const DAYS=[["pre","Previos","P"],["vie","Viernes","V"],["sab","Sábado","S"],["dom","Domingo","D"]];
+const ADAY={A01:"vie",A02:"vie",A03:"vie",A06:"vie",A12:"vie",A22:"vie",A23:"pre",A09:"dom",A16:"dom"};
 const DAYLBL={pre:"PREV",vie:"VIE",sab:"SÁB",dom:"DOM",all:"TODO"};
 // task preferences in the form -> short label + suggested areas
 const TASKS=[
@@ -273,13 +287,13 @@ function suggest(v){
   .map(([c,p])=>({c,p,why:[...(why[c]||[])].slice(0,3).join(", ")}));
 }
 
-let vols=[], asg={}, st={tab:"vol",q:"",estado:null,day:null,veh:null,task:null}, openAdd=null;
+let vols=[], asg={}, st={tab:"vol",q:"",estado:null,day:null,veh:null,task:null}, openAdd=null, openArea=null, showUn=false;
 let dbOk=false, lastSync=null;
 try{const t=localStorage.getItem("mbv_tab"); if(t==="area")st.tab="area";}catch(e){}
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const slug=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,80)||"sin-nombre";
+const slug=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,80)||"sin-nombre";
 const title=s=>String(s||"").trim().toLowerCase().replace(/(^|[\s\-'’])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
 function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2200);}
 
@@ -307,7 +321,8 @@ function buildVols(rows){
    tasks:TASKS.filter(t=>t.re.test(tareas)),veh:VEH.filter(x=>x.re.test(veh)),obs,dupes:0};
   const prev=map.get(id); if(prev){v.dupes=prev.dupes+1;} map.set(id,v);
  });
- return [...map.values()];
+ const BAJAS=new Set(["eva-cardenosa-lopez","eric-casas-jurado","edgard-martinez-mesalles","marc-tejedor-gros","ignasi-barri-vilardell"]); // no vienen
+ return [...map.values()].filter(v=>!BAJAS.has(v.id));
 }
 function status(v){const a=asg[v.id]; if(!a||!(a.items||[]).length) return "none"; return a.confirmado?"conf":"asig";}
 function specials(v){return v.tasks.filter(t=>t.sp);}
@@ -376,15 +391,31 @@ function card(v){
    <div class="actions"><button type="button" class="btn pri" data-add="1"${dbOk?"":" disabled"}>+ Asignar</button>${items.length?`<button type="button" class="btn okb" data-conf="1" aria-pressed="${!!a.confirmado}">${a.confirmado?"✓ Confirmado":"Marcar confirmado"}</button>`:""}</div>`}
   </div></article>`;
 }
+function vehShort(v){return v.veh.filter(x=>x.k!=="nov").map(x=>x.l).join(", ")||"sin vehículo";}
+function addForm(c){
+ const inA=new Set((vols.filter(v=>(asg[v.id]?.items||[]).some(i=>i.area===c))).map(v=>v.id));
+ const L=vols.filter(v=>!inA.has(v.id)).sort((a,b)=>(status(a)==="none"?0:1)-(status(b)==="none"?0:1)||a.name.localeCompare(b.name));
+ const lab=v=>{const it=(asg[v.id]?.items||[]);return v.name+" · "+vehShort(v)+" · "+(it.length?it.map(i=>(AREA[i.area]?.s||i.area)+" "+(DAYLBL[i.dia]||"").toLowerCase()).join(", "):"SIN ASIGNAR");};
+ const d0=ADAY[c]||"sab";
+ return `<div class="aform"><select id="asel-${c}" aria-label="Voluntario para ${c}"><optgroup label="Sin asignar">${L.filter(v=>status(v)==="none").map(v=>`<option value="${v.id}">${esc(lab(v))}</option>`).join("")}</optgroup><optgroup label="Ya tienen otra área">${L.filter(v=>status(v)!=="none").map(v=>`<option value="${v.id}">${esc(lab(v))}</option>`).join("")}</optgroup></select>
+ <select id="aday-${c}" aria-label="Día">${DAYS.map(d=>`<option value="${d[0]}"${d[0]===d0?" selected":""}>${d[1]}</option>`).join("")}</select>
+ <div class="aformb"><button type="button" class="btn pri" data-aok="${c}">Añadir</button><button type="button" class="btn" data-acancel="1">Cancelar</button></div></div>`;
+}
+function unPanel(){
+ const U=vols.filter(v=>status(v)==="none").sort((a,b)=>a.name.localeCompare(b.name));
+ return `<div class="unbar"><button type="button" class="btn${showUn?" pri":""}" id="untog">${showUn?"Ocultar":"Ver"} voluntarios sin área (${U.length})</button><span class="unk">Para añadir a alguien a un área, pulsa «+ Añadir voluntario» en su tarjeta.</span></div>
+ ${showUn?`<div class="unlist">${U.length?U.map(v=>`<div class="unit"><b>${esc(v.name)}</b><span>${DAYS.filter(d=>v.days[d[0]]).map(d=>d[1].slice(0,3)).join(" · ")||"días sin marcar"}</span><span>${esc(vehShort(v))}</span>${v.tel?`<span class="mono">${esc(v.tel)}</span>`:""}${(()=>{const s=suggest(v)[0];return s?`<span class="sug">Encaja: ${s.c} ${esc(AREA[s.c].s)}</span>`:""})()}</div>`).join(""):'<div class="aempty">Todos los voluntarios tienen al menos un área.</div>'}</div>`:""}`;
+}
 function renderAreas(){
  const by={}; AREAS.forEach(a=>by[a[0]]=[]);
  const cons={}; AREAS.forEach(a=>cons[a[0]]=[]);
  vols.forEach(v=>{if(!passes(v))return;(asg[v.id]?.items||[]).forEach(it=>{(by[it.area]=by[it.area]||[]).push({v,it,conf:asg[v.id].confirmado});});
   if(status(v)==="none"){const s0=suggest(v)[0];if(s0)cons[s0.c].push(v);}});
  const order={pre:0,vie:1,sab:2,dom:3,all:4};
- return `<div class="areas">${AREAS.map(([c,n,r])=>{const L=(by[c]||[]).sort((x,y)=>order[x.it.dia]-order[y.it.dia]||x.v.name.localeCompare(y.v.name));
+ return unPanel()+`<div class="areas">${AREAS.map(([c,n,r])=>{const L=(by[c]||[]).sort((x,y)=>order[x.it.dia]-order[y.it.dia]||x.v.name.localeCompare(y.v.name));
   return `<div class="acard${L.length?"":" empty"}"><div class="ahead"><div><div class="acode">${c} · resp. ${esc(r)}</div><div class="aname">${esc(n)}</div></div><div class="acount">${L.length}</div></div>
-  ${L.length?`<div class="alist">${L.map(x=>`<div class="aitem${x.conf?" conf":""}"><span class="nm">${esc(x.v.name)}</span><span class="dd">${DAYLBL[x.it.dia]||""}${x.v.veh.some(y=>y.strong)?" · "+esc(x.v.veh.find(y=>y.strong).l):""}</span></div>`).join("")}</div>`:'<div class="aempty">Sin voluntarios asignados</div>'}
+  ${L.length?`<div class="alist">${L.map(x=>`<div class="aitem${x.conf?" conf":""}"><span class="nm">${esc(x.v.name)}</span><span class="dd">${DAYLBL[x.it.dia]||""}${x.v.veh.some(y=>y.strong)?" · "+esc(x.v.veh.find(y=>y.strong).l):""}</span><button type="button" class="arm" data-arm="${x.v.id}|${c}|${x.it.dia}" aria-label="Quitar a ${esc(x.v.name)} de ${c}" title="Quitar de esta área">×</button></div>`).join("")}</div>`:'<div class="aempty">Sin voluntarios asignados</div>'}
+  ${openArea===c?addForm(c):`<button type="button" class="aadd" data-aopen="${c}"${dbOk?"":" disabled"}>+ Añadir voluntario</button>`}
   ${cons[c].length?`<div class="acons"><span class="lab">Consejo (sin asignar):</span> ${cons[c].map(v=>esc(v.name)).join(" · ")}</div>`:""}</div>`}).join("")}</div>`;
 }
 function render(){
@@ -419,6 +450,13 @@ document.addEventListener("click",async ev=>{
  if(t.dataset.est){st.estado=st.estado===t.dataset.est?null:t.dataset.est;st.tab="vol";render();return;}
  if(t.dataset.veh){st.veh=st.veh===t.dataset.veh?null:t.dataset.veh;st.tab="vol";render();return;}
  if(t.dataset.copy!==undefined){const val=t.dataset.copy;try{await navigator.clipboard.writeText(val);toast("Teléfono copiado")}catch(e){toast(val)};return;}
+ if(t.id==="untog"){showUn=!showUn;render();return;}
+ if(t.dataset.aopen){openArea=t.dataset.aopen;render();document.getElementById("asel-"+openArea)?.focus();return;}
+ if(t.dataset.acancel){openArea=null;render();return;}
+ if(t.dataset.aok){const ac=t.dataset.aok,vid=$("#asel-"+ac)?.value,dia=$("#aday-"+ac)?.value;if(!vid)return;openArea=null;const cu=asg[vid]||{items:[]};
+  if((cu.items||[]).some(i=>i.area===ac&&i.dia===dia)){render();return;}
+  await saveAsg(vid,{items:[...(cu.items||[]),{area:ac,dia}]});toast("Añadido a "+ac);return;}
+ if(t.dataset.arm){const [vid,ac,dia]=t.dataset.arm.split("|");const cu=asg[vid]||{items:[]};await saveAsg(vid,{items:(cu.items||[]).filter(i=>!(i.area===ac&&i.dia===dia))});toast("Quitado de "+ac);return;}
  const c=t.closest(".card"); if(!c) return; const id=c.dataset.id; const cur=asg[id]||{items:[]};
  if(t.dataset.add){openAdd=id;render();$("#sel-area-"+id)?.focus();return;}
  if(t.dataset.cancel){openAdd=null;render();return;}
@@ -443,7 +481,7 @@ async function load(manual){
   const j=await MB.call("vol");
   vols=buildVols(j.rows); asg=j.asig||{}; lastSync=j.ts; dbOk=true;
   setSync("live",`${vols.length} voluntarios · al día ${fmt(lastSync)}`); banner("");
-  if(!openAdd) render();
+  if(!openAdd&&!openArea) render();
   if(manual) toast("Datos actualizados");
  }catch(e){
   if(e.code==="clave"){MB.logout();return;}
