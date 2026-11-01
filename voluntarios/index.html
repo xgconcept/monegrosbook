@@ -480,6 +480,10 @@ async function load(manual){
  try{
   const j=await MB.call("vol");
   vols=buildVols(j.rows); asg=j.asig||{}; lastSync=j.ts; dbOk=true;
+  // gente asignada a mano que no está en el formulario (01/11): también sale aquí
+  {const have=new Set(vols.map(v=>v.id));Object.keys(asg).forEach(id=>{const a=asg[id];if(have.has(id)||!(a.items||[]).length)return;
+   const d={pre:0,vie:0,sab:0,dom:0};a.items.forEach(i=>{if(i.dia==="all")Object.keys(d).forEach(k=>d[k]=1);else d[i.dia]=1;});
+   vols.push({id,name:a.nombre||id,tel:"",mail:"",talla:"",ts:"",order:9999,days:d,tasks:[],veh:[],obs:"Añadido a mano (no está en el formulario)",dupes:0});});}
   setSync("live",`${vols.length} voluntarios · al día ${fmt(lastSync)}`); banner("");
   if(!openAdd&&!openArea) render();
   if(manual) toast("Datos actualizados");
