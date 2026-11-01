@@ -149,6 +149,7 @@ button.kpi:hover{border-color:var(--blue)}
 .alist{display:flex;flex-direction:column;gap:3px}
 .aitem{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:3px 0;border-top:1px solid var(--hair)}
 .aitem .dd{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--sub)}
+.tu{display:inline-block;font:700 10.5px/1 var(--mono,monospace);padding:3px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;background:#e9f7ef;color:#1d8a55;text-transform:uppercase}.tu-man,.tu-tar{background:#fff1d6;color:#8a5a00}.tu-no{background:#fdecea;color:#b3261e}
 .aitem.conf::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok);align-self:center;margin-right:-2px}
 .aitem .nm{flex:1}
 .aempty{font-size:12px;color:var(--terra);font-weight:600}
@@ -412,12 +413,12 @@ function unPanel(){
 function renderAreas(){
  const by={}; AREAS.forEach(a=>by[a[0]]=[]);
  const cons={}; AREAS.forEach(a=>cons[a[0]]=[]);
- vols.forEach(v=>{if(!passes(v))return;(asg[v.id]?.items||[]).forEach(it=>{(by[it.area]=by[it.area]||[]).push({v,it,conf:asg[v.id].confirmado});});
+ vols.forEach(v=>{if(!passes(v))return;(asg[v.id]?.items||[]).forEach(it=>{{const cf=asg[v.id].conf||{},k=it.area+"|"+it.dia;(by[it.area]=by[it.area]||[]).push({v,it,conf:cf[k]==="ok"||(!cf[k]&&asg[v.id].confirmado),no:cf[k]==="no",t:cf[k+"|t"]||""});}});
   if(status(v)==="none"){const s0=suggest(v)[0];if(s0)cons[s0.c].push(v);}});
  const order={pre:0,vie:1,sab:2,dom:3,all:4};
  return unPanel()+`<div class="areas">${AREAS.map(([c,n,r])=>{const L=(by[c]||[]).sort((x,y)=>order[x.it.dia]-order[y.it.dia]||x.v.name.localeCompare(y.v.name));
   return `<div class="acard${L.length?"":" empty"}"><div class="ahead"><div><div class="acode">${c} · resp. ${esc(r)}</div><div class="aname">${esc(n)}</div></div><div class="acount">${L.length}</div></div>
-  ${L.length?`<div class="alist">${L.map(x=>`<div class="aitem${x.conf?" conf":""}"><span class="nm">${esc(x.v.name)}${x.it.puesto?` <span class="pu">${esc(x.it.puesto)}</span>`:""}</span><span class="dd">${DAYLBL[x.it.dia]||""}${x.v.veh.some(y=>y.strong)?" · "+esc(x.v.veh.find(y=>y.strong).l):""}</span><button type="button" class="apu" data-apu="${x.v.id}|${c}|${x.it.dia}" aria-label="Puesto de ${esc(x.v.name)}" title="Poner o cambiar el puesto">✎</button><button type="button" class="arm" data-arm="${x.v.id}|${c}|${x.it.dia}" aria-label="Quitar a ${esc(x.v.name)} de ${c}" title="Quitar de esta área">×</button></div>`).join("")}</div>`:'<div class="aempty">Sin voluntarios asignados</div>'}
+  ${L.length?`<div class="alist">${L.map(x=>`<div class="aitem${x.conf?" conf":""}"><span class="nm">${esc(x.v.name)}${x.it.puesto?` <span class="pu">${esc(x.it.puesto)}</span>`:""}${x.t?` <span class="tu tu-${x.t}">${{todo:"Todo el horario",man:"Solo mañana",tar:"Solo tarde"}[x.t]||""}</span>`:""}${x.no?` <span class="tu tu-no">No puede</span>`:""}</span><span class="dd">${DAYLBL[x.it.dia]||""}${x.v.veh.some(y=>y.strong)?" · "+esc(x.v.veh.find(y=>y.strong).l):""}</span><button type="button" class="apu" data-apu="${x.v.id}|${c}|${x.it.dia}" aria-label="Puesto de ${esc(x.v.name)}" title="Poner o cambiar el puesto">✎</button><button type="button" class="arm" data-arm="${x.v.id}|${c}|${x.it.dia}" aria-label="Quitar a ${esc(x.v.name)} de ${c}" title="Quitar de esta área">×</button></div>`).join("")}</div>`:'<div class="aempty">Sin voluntarios asignados</div>'}
   ${openArea===c?addForm(c):`<button type="button" class="aadd" data-aopen="${c}"${dbOk?"":" disabled"}>+ Añadir voluntario</button>`}
   ${cons[c].length?`<div class="acons"><span class="lab">Consejo (sin asignar):</span> ${cons[c].map(v=>esc(v.name)).join(" · ")}</div>`:""}</div>`}).join("")}</div>`;
 }
