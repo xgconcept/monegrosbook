@@ -45,7 +45,8 @@ i.d.no{background:#b3261e}
 .tp.no{background:#fdecea;color:#b3261e}
 .cf.fy{background:#FABD12;color:#231a00;border:1px solid #d9a20a}
 .fiesta-ban{margin:14px 0 6px;padding:10px 14px;border-radius:8px;background:#FFF3CC;border-left:5px solid #FABD12;font-size:14px;color:#231a00}
-.cf.rs{background:#0F4270;color:#fff;border:1px solid #0F4270;margin-right:6px}.cf.ok{background:#dcf3e7;color:#1d8a55;border:1px solid #1d8a55}
+.cf.rs{background:#0F4270;color:#fff;border:1px solid #0F4270;margin-right:6px}
+.cf.pu{background:#FABD12;color:#231a00;border:1px solid #d9a20a;text-transform:none;margin-right:6px}.cf.ok{background:#dcf3e7;color:#1d8a55;border:1px solid #1d8a55}
 @media (prefers-color-scheme: dark){.shift.asg .hrs{color:#FABD12}}
 .hz{display:block;font-size:13px;line-height:1.35;margin:4px 0 2px;color:var(--ink,#0d1b2a)}.hz b{font-weight:700}.hz small{color:var(--sub,#5b6878);font-size:12px}
 </style></head><body>
@@ -567,14 +568,14 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
  function build(d){
   var A={};(d.areas||[]).forEach(function(a){A[a.c]=a;});
   // áreas que aún no están en WEB_AREAS (27/10)
-  var EXTRA={A22:'Zona Staff y Descanso',A23:'Montaje del jueves',A24:'Gasolinera de Sena',A25:'Gasolinera de Mequinenza'};
+  var EXTRA=window.MBEXTRA||{A22:'Zona Staff y Descanso',A23:'Montaje del jueves',A24:'Gasolinera de Sena',A25:'Gasolinera de Mequinenza'};
   Object.keys(EXTRA).forEach(function(c){if(!A[c])A[c]={c:c,n:EXTRA[c],r:'',g:''};});
   var P={};
   function person(n){var k=MB.slug(n);return P[k]=P[k]||{id:k,nombre:n,items:[],cm:{}};}
   // confirmación por área (27/10): cada voluntario confirma cada puesto; conf = {"A19|sab":"ok"|"no","COMIDA|dom":"si"|"no"}
   (d.people||[]).forEach(function(v){var x=person(v.nombre),c=v.conf||{};if(typeof c==='string'){try{c=JSON.parse(c||'{}');}catch(e){c={};}}
    Object.keys(PEND).forEach(function(k){var q=k.split('~');if(q[0]===v.id)c[q[1]]=PEND[k];});
-   x.aid=v.id;x.cm=c;v.items.forEach(function(i){var st=c[i.area+'|'+i.dia]||(v.confirmado?'ok':'');x.items.push({area:i.area,dia:i.dia,st:st,conf:st==='ok'});});});
+   x.aid=v.id;x.cm=c;v.items.forEach(function(i){var st=c[i.area+'|'+i.dia]||(v.confirmado?'ok':'');x.items.push({area:i.area,dia:i.dia,st:st,conf:st==='ok',pu:i.puesto||''});});});
   // responsables: si ya está como voluntario (mismo nombre o parecido: «Cesc Piñol» = «Cesc Piñol Piñol»), una sola tarjeta
   function dist(a,b){var m=a.length,n=b.length,d=[],x,y;for(x=0;x<=m;x++){d[x]=[x];}for(y=0;y<=n;y++)d[0][y]=y;for(x=1;x<=m;x++)for(y=1;y<=n;y++)d[x][y]=Math.min(d[x-1][y]+1,d[x][y-1]+1,d[x-1][y-1]+(a[x-1]===b[y-1]?0:1));return d[m][n];}
   function match(n){var k=MB.slug(n);if(P[k])return P[k];var t=k.split('-');
@@ -583,7 +584,7 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
    return hit.length===1?P[hit[0]]:person(n);}
   (d.areas||[]).forEach(function(a){String(a.r||'').split(/\s*\/\s*/).forEach(function(n){if(n&&n.length>2){var x=match(n);x.items.push({area:a.c,dia:'all',resp:true});}});});
   // responsable: en vez de «todo el evento», los días reales de su área; si además está de voluntario en su área ese día, una sola línea
-  var AD={A01:['vie'],A02:['vie'],A03:['vie'],A04:['sab'],A05:['sab'],A06:['vie'],A07:['sab'],A08:['sab'],A09:['dom'],A10:['sab'],A11:['sab'],A12:['vie','sab'],A13:['jue','vie'],A14:['sab'],A15:['sab'],A16:['dom'],A17:['vie','sab'],A18:['vie','sab'],A19:['sab'],A20:['sab'],A21:['sab'],A22:['vie','sab','dom'],A23:['pre'],A24:['sab'],A25:['sab']};
+  var AD=window.MBAD||{A01:['vie'],A02:['vie'],A03:['vie'],A04:['sab'],A05:['sab'],A06:['vie'],A07:['sab'],A08:['sab'],A09:['dom'],A10:['sab'],A11:['sab'],A12:['vie','sab'],A13:['jue','vie'],A14:['sab'],A15:['sab'],A16:['dom'],A17:['vie','sab'],A18:['vie','sab'],A19:['sab'],A20:['sab'],A21:['sab'],A22:['vie','sab','dom'],A23:['pre'],A24:['sab'],A25:['sab']};
   Object.keys(P).forEach(function(k){var p=P[k],out=[];
    p.items.forEach(function(i){if(!i.resp){out.push(i);return;}
     (AD[i.area]||['vie']).forEach(function(d){d=d==='jue'?'pre':d;var same=out.filter(function(o){return !o.resp&&o.area===i.area&&o.dia===d;})[0];
@@ -619,7 +620,7 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
     its.map(function(i){var a=A[i.area]||{n:i.area,g:''},dd=DAY[i.dia]||['—',''],pend=!(i.resp||i.conf)&&i.st!=='no';
      var H=HOR[i.area]; if(!H) return '<li class="shift'+(pend?' pend':'')+'"><div class="dy"><b>'+dd[0]+'</b><span>'+dd[1]+'</span></div><div class="tm"><div class="time word tbc">'+(i.dia==='all'?'Todo el evento':'Hora por confirmar')+'</div></div>'+'<div class="wh"><span class="ar">'+esc(i.area)+' · '+esc(a.n)+'</span><span class="cg">'+(i.resp?'Responsable del área':'Voluntario')+'</span>'+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';
      return '<li class="shift asg'+(pend?' pend':'')+(i.st==='no'?' no':'')+'"><div class="dy"><b>'+dd[0]+'</b><span>'+dd[1]+'</span></div><div class="tm"><button type="button" class="aname2 aopen" data-area="'+esc(i.area)+'" title="Ver quién está en esta área">'+esc(a.n)+' <span class="aw">Ver equipo →</span></button><div class="hrs">'+esc(hrsOf(i))+'</div></div>'+
-      '<div class="wh"><span class="cg tk">'+esc(H[1])+'</span>'+(i.resp||i.resp2?'<span class="cf rs">Responsable del área</span>':'')+(!i.resp&&!i.resp2&&LONG[i.area]&&!SHORTD[i.area+'|'+i.dia]?'<span class="rot"><b class="rk">Son muchas horas.</b> Cuando tengamos a todo el equipo disponible y confirmado, el responsable del área repartirá <b>turnos y rotaciones</b>.</span>':'')+'<span class="ar">'+esc(i.area)+'</span>'+(i.resp?'':cbox(p,i.area+'|'+i.dia,i.st,0))+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';}).join('')+fiestaLi(p)+'</ol></article>';}).join('')
+      '<div class="wh"><span class="cg tk">'+esc(H[1])+'</span>'+(i.pu?'<span class="cf pu">Tu puesto: <b>'+esc(i.pu)+'</b></span>':'')+(i.resp||i.resp2?'<span class="cf rs">Responsable del área</span>':'')+(!i.resp&&!i.resp2&&LONG[i.area]&&!SHORTD[i.area+'|'+i.dia]?'<span class="rot"><b class="rk">Son muchas horas.</b> Cuando tengamos a todo el equipo disponible y confirmado, el responsable del área repartirá <b>turnos y rotaciones</b>.</span>':'')+'<span class="ar">'+esc(i.area)+'</span>'+(i.resp?'':cbox(p,i.area+'|'+i.dia,i.st,0))+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';}).join('')+fiestaLi(p)+'</ol></article>';}).join('')
    :'<p class="empty" style="display:block">Todavía no hay nadie asignado.</p>';
   if(window.MBsearch) window.MBsearch();
   var lv=document.getElementById('live'); if(lv) lv.textContent='en vivo · '+MB.hm(d.ts);
@@ -644,8 +645,14 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
   }catch(err){ delete PEND[pk]; if(LAST) build(LAST); if(MB.toast) MB.toast('No se ha podido guardar. Prueba otra vez.'); }
  });
  var busy=false;
+ // áreas y horarios: una sola fuente, ../assets/areas.json (01/11). Si no carga, se usan los de este archivo.
+ async function areasJSON(){ if(window.MBEXTRA) return; try{ var r=await fetch('../assets/areas.json?h='+Math.floor(Date.now()/600000)); if(!r.ok) return; var j=await r.json(), X={}, D={};
+  Object.keys(j.areas).forEach(function(c){ var a=j.areas[c], ds=Object.keys(a.hor||{}); X[c]=a.n; D[c]=(a.dias||[]).slice();
+   if(ds.length){ HOR[c]=[a.hor[ds[0]], a.tarea||''];  ds.forEach(function(d){ if(a.hor[d]!==a.hor[ds[0]]) HORD[c+'|'+d]=a.hor[d]; }); } else if(a.tarea){ HOR[c]=['Hora por confirmar',a.tarea]; }
+   if(a.largo) LONG[c]=1; else delete LONG[c]; (a.cortos||[]).forEach(function(d){ SHORTD[c+'|'+d]=1; }); });
+  window.MBEXTRA=X; window.MBAD=D; }catch(e){} }
  async function load(){ if(busy) return; busy=true;
-  try{ LAST=await MB.call('tablon'); build(LAST); }
+  try{ await areasJSON(); LAST=await MB.call('tablon'); build(LAST); }
   catch(e){ if(e.code==='clave'){MB.logout();return;} var lv=document.getElementById('live'); if(lv) lv.textContent='sin conexión'; }
   finally{busy=false;} }
  // «Equipos por área» solo para la organización: con la clave de gestión, o tocando el punto discreto del pie y poniéndola
