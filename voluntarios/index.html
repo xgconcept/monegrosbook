@@ -154,6 +154,9 @@ button.kpi:hover{border-color:var(--blue)}
 .aempty{font-size:12px;color:var(--terra);font-weight:600}
 .arm{all:unset;cursor:pointer;color:var(--sub);font-size:15px;line-height:1;padding:0 4px}
 .arm:hover,.arm:focus-visible{color:var(--terra)}
+.apu{all:unset;cursor:pointer;color:var(--sub);font-size:13px;line-height:1;padding:0 3px}
+.apu:hover,.apu:focus-visible{color:var(--ink)}
+.aitem .pu{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;background:var(--yellow-soft);color:var(--ink);padding:1px 5px;border-radius:3px;white-space:nowrap}
 .aadd{all:unset;cursor:pointer;box-sizing:border-box;text-align:center;font-size:12px;font-weight:700;border:1px dashed var(--hair);border-radius:6px;padding:6px;color:var(--sub)}
 .aadd:hover,.aadd:focus-visible{border-color:var(--ink);color:var(--ink)}
 .aform{display:flex;flex-direction:column;gap:6px;border-top:1px dashed var(--hair);padding-top:6px}
@@ -414,7 +417,7 @@ function renderAreas(){
  const order={pre:0,vie:1,sab:2,dom:3,all:4};
  return unPanel()+`<div class="areas">${AREAS.map(([c,n,r])=>{const L=(by[c]||[]).sort((x,y)=>order[x.it.dia]-order[y.it.dia]||x.v.name.localeCompare(y.v.name));
   return `<div class="acard${L.length?"":" empty"}"><div class="ahead"><div><div class="acode">${c} · resp. ${esc(r)}</div><div class="aname">${esc(n)}</div></div><div class="acount">${L.length}</div></div>
-  ${L.length?`<div class="alist">${L.map(x=>`<div class="aitem${x.conf?" conf":""}"><span class="nm">${esc(x.v.name)}</span><span class="dd">${DAYLBL[x.it.dia]||""}${x.v.veh.some(y=>y.strong)?" · "+esc(x.v.veh.find(y=>y.strong).l):""}</span><button type="button" class="arm" data-arm="${x.v.id}|${c}|${x.it.dia}" aria-label="Quitar a ${esc(x.v.name)} de ${c}" title="Quitar de esta área">×</button></div>`).join("")}</div>`:'<div class="aempty">Sin voluntarios asignados</div>'}
+  ${L.length?`<div class="alist">${L.map(x=>`<div class="aitem${x.conf?" conf":""}"><span class="nm">${esc(x.v.name)}${x.it.puesto?` <span class="pu">${esc(x.it.puesto)}</span>`:""}</span><span class="dd">${DAYLBL[x.it.dia]||""}${x.v.veh.some(y=>y.strong)?" · "+esc(x.v.veh.find(y=>y.strong).l):""}</span><button type="button" class="apu" data-apu="${x.v.id}|${c}|${x.it.dia}" aria-label="Puesto de ${esc(x.v.name)}" title="Poner o cambiar el puesto">✎</button><button type="button" class="arm" data-arm="${x.v.id}|${c}|${x.it.dia}" aria-label="Quitar a ${esc(x.v.name)} de ${c}" title="Quitar de esta área">×</button></div>`).join("")}</div>`:'<div class="aempty">Sin voluntarios asignados</div>'}
   ${openArea===c?addForm(c):`<button type="button" class="aadd" data-aopen="${c}"${dbOk?"":" disabled"}>+ Añadir voluntario</button>`}
   ${cons[c].length?`<div class="acons"><span class="lab">Consejo (sin asignar):</span> ${cons[c].map(v=>esc(v.name)).join(" · ")}</div>`:""}</div>`}).join("")}</div>`;
 }
@@ -456,6 +459,10 @@ document.addEventListener("click",async ev=>{
  if(t.dataset.aok){const ac=t.dataset.aok,vid=$("#asel-"+ac)?.value,dia=$("#aday-"+ac)?.value;if(!vid)return;openArea=null;const cu=asg[vid]||{items:[]};
   if((cu.items||[]).some(i=>i.area===ac&&i.dia===dia)){render();return;}
   await saveAsg(vid,{items:[...(cu.items||[]),{area:ac,dia}]});toast("Añadido a "+ac);return;}
+ if(t.dataset.apu){const [vid,ac,dia]=t.dataset.apu.split("|");const cu=asg[vid]||{items:[]};const it=(cu.items||[]).find(i=>i.area===ac&&i.dia===dia);if(!it)return;
+  const v=window.prompt("Puesto de "+(asg[vid]?.nombre||vid)+" en "+ac+" (ej. PV 3 · CHARLY 1). Vacío = sin puesto.",it.puesto||"");if(v===null)return;
+  const items=(cu.items||[]).map(i=>{if(i!==it)return i;const o={area:i.area,dia:i.dia};if(v.trim())o.puesto=v.trim().slice(0,40);return o;});
+  await saveAsg(vid,{items});toast(v.trim()?"Puesto guardado":"Puesto quitado");return;}
  if(t.dataset.arm){const [vid,ac,dia]=t.dataset.arm.split("|");const cu=asg[vid]||{items:[]};await saveAsg(vid,{items:(cu.items||[]).filter(i=>!(i.area===ac&&i.dia===dia))});toast("Quitado de "+ac);return;}
  const c=t.closest(".card"); if(!c) return; const id=c.dataset.id; const cur=asg[id]||{items:[]};
  if(t.dataset.add){openAdd=id;render();$("#sel-area-"+id)?.focus();return;}
@@ -474,11 +481,17 @@ function setSync(kind,txt){$("#dot").className="dot"+(kind==="live"?" live":kind
 function fmt(ts){const d=new Date(ts);return d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});}
 function banner(html,err){$("#banners").innerHTML=html?`<div class="banner${err?" err":""}">${html}</div>`:"";}
 let loading=false;
+// áreas y horarios: una sola fuente, ../assets/areas.json (01/11). Si no carga, se usan las de este archivo.
+let areasOK=false;
+async function areasJSON(){ if(areasOK) return; try{ const r=await fetch("../assets/areas.json?h="+Math.floor(Date.now()/600000)); if(!r.ok) return; const j=await r.json();
+ const L=Object.keys(j.areas).sort().map(c=>[c,j.areas[c].n,j.areas[c].r||""]); AREAS.length=0; L.forEach(a=>AREAS.push(a));
+ Object.keys(AREA).forEach(k=>delete AREA[k]); L.forEach(a=>{const x=j.areas[a[0]];SHORT[a[0]]=x.s||a[0];AREA[a[0]]={c:a[0],n:a[1],r:a[2],s:SHORT[a[0]]};ADAY[a[0]]=x.dia||"sab";});
+ areasOK=true; }catch(e){} }
 async function load(manual){
  if(loading) return; loading=true;
  if(manual) setSync("","Actualizando…");
  try{
-  const j=await MB.call("vol");
+  await areasJSON(); const j=await MB.call("vol");
   vols=buildVols(j.rows); asg=j.asig||{}; lastSync=j.ts; dbOk=true;
   // gente asignada a mano que no está en el formulario (01/11): también sale aquí
   {const have=new Set(vols.map(v=>v.id));Object.keys(asg).forEach(id=>{const a=asg[id];if(have.has(id)||!(a.items||[]).length)return;
