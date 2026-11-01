@@ -34,6 +34,10 @@
 .cbx .cq{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;color:#7a4a00;margin-right:auto}
 .cb{font:700 15px/1 'Barlow Condensed',sans-serif;letter-spacing:.02em;text-transform:uppercase;padding:11px 16px;border-radius:999px;cursor:pointer;border:2px solid #0F4270;background:#fff;color:#0F4270;min-height:44px}
 .cb.y{background:#1d8a55;border-color:#1d8a55;color:#fff}.cb.n{border-color:#b3261e;color:#b3261e}
+.cbx .tq{flex-basis:100%;font:600 13px/1.35 'IBM Plex Sans',sans-serif;color:#7a4a00;margin:-2px 0 0}
+.cb.t{background:#fff;border-color:#1d8a55;color:#1d8a55}
+.cb.t small{display:block;font:500 11px 'IBM Plex Mono',monospace;text-transform:none;opacity:.85}
+.cbx .tt{display:block;font:600 13px 'IBM Plex Sans',sans-serif;color:#1d8a55}
 .cb.lnk{border:0;background:none;padding:6px 4px;min-height:0;font-size:13px;text-decoration:underline;color:#56606b;text-transform:none}
 .cb[disabled]{opacity:.5;cursor:wait}
 .cbx.ok{background:#e9f7ef;border:1.5px solid #1d8a55}.cbx.no{background:#fdecea;border:1.5px solid #b3261e}
@@ -549,14 +553,27 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
  var PEND={}, LAST=null;
  var WA='https://wa.me/34643455398';
  // caja de confirmación de cada área: el voluntario clica y se guarda en su fila (asig.conf)
- function cbox(p,k,st,com){if(!p.aid)return '';
+ // turnos (01/11): en horarios largos (6 h o más, menos marshals) el voluntario elige todo / mañana / tarde → conf["A01|vie|t"]="todo"|"man"|"tar"
+ var NOTURNO={A19:1,A21:1,A24:1,A25:1}, TN={todo:'Todo el horario',man:'Solo turno de mañana',tar:'Solo turno de tarde'};
+ function mm(x){var q=x.split(':');return +q[0]*60+(+q[1]);}
+ function hh(m){m=((m%1440)+1440)%1440;return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+m%60).slice(-2);}
+ function tsplit(i){if(NOTURNO[i.area]||!LONG[i.area]||SHORTD[i.area+'|'+i.dia]||!HOR[i.area])return null;
+  var h=(hrsOf(i)||'').match(/(\d\d:\d\d)\s*[–-]\s*(\d\d:\d\d)/);if(!h)return null;
+  var a=mm(h[1]),b=mm(h[2]);if(b<a)b+=1440;if(b-a<360)return null;
+  var c=(a<840&&b>840)?840:Math.round((a+b)/120)*60;return {m:h[1]+'–'+hh(c),t:hh(c)+'–'+h[2]};}
+ function tbtns(T,cls){return '<button type="button" class="cb t'+cls+'" data-t="todo">Todo el horario</button><button type="button" class="cb t'+cls+'" data-t="man">Solo mañana<small>'+T.m+'</small></button><button type="button" class="cb t'+cls+'" data-t="tar">Solo tarde<small>'+T.t+'</small></button>';}
+ function cbox(p,k,st,com,T){if(!p.aid)return '';
   var b=' data-id="'+esc(p.aid)+'" data-k="'+esc(k)+'"';
   if(com){
    if(st==='si')return '<div class="cbx ok"'+b+'><span class="cs">✓ Vienes a comer</span><button type="button" class="cb lnk" data-v="">cambiar</button></div>';
    if(st==='no')return '<div class="cbx no"'+b+'><span class="cs">No vienes a comer</span><button type="button" class="cb lnk" data-v="">cambiar</button></div>';
    return '<div class="cbx"'+b+'><span class="cq">¿Vienes a comer?</span><button type="button" class="cb y" data-v="si">Sí, vengo</button><button type="button" class="cb n" data-v="no">No vengo</button></div>';}
+  if(st==='ok'&&T){var tv=p.cm[k+'|t'];
+   if(TN[tv])return '<div class="cbx ok"'+b+'><span class="cs">✓ Confirmado<span class="tt">'+TN[tv]+(tv==='man'?' · '+T.m:tv==='tar'?' · '+T.t:'')+'</span></span><button type="button" class="cb lnk" data-v="">cambiar</button></div>';
+   return '<div class="cbx"'+b+' data-st="ok"><span class="cq">✓ Confirmado · ¿qué horario puedes hacer?</span>'+tbtns(T,'')+'<button type="button" class="cb lnk" data-v="">cambiar</button></div>';}
   if(st==='ok')return '<div class="cbx ok"'+b+'><span class="cs">✓ Confirmado</span><button type="button" class="cb lnk" data-v="">cambiar</button></div>';
   if(st==='no')return '<div class="cbx no"'+b+'><span class="cs">✗ No puedes</span><a class="wa" href="'+WA+'" target="_blank" rel="noopener">Escríbenos y lo cambiamos →</a><button type="button" class="cb lnk" data-v="">cambiar</button></div>';
+  if(T)return '<div class="cbx"'+b+'><span class="cq">¿Puedes venir? ¿Qué horario te va mejor?</span><span class="tq">Son muchas horas: dinos si puedes todo el horario o solo un turno.</span>'+tbtns(T,'')+'<button type="button" class="cb n" data-v="no">✗ No puedo</button></div>';
   return '<div class="cbx"'+b+'><span class="cq">¿Te va bien esta área?</span><button type="button" class="cb y" data-v="ok">✓ Me va bien</button><button type="button" class="cb n" data-v="no">✗ No puedo</button></div>';}
  function fiestaLi(p){return FIESTA_LI.replace('{{CB}}',p.aid?cbox(p,'COMIDA|dom',p.cm['COMIDA|dom']||'',1):'<span class="cf fy">Dinos si vienes a comer</span>');}
  var SHORTD={'A12|sab':1,'A22|sab':1};
@@ -603,7 +620,7 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
   document.querySelector('.legend').innerHTML='<span><i class="d ok"></i>Confirmado</span><span><i class="d pd"></i>Asignado, por confirmar</span><span><i class="d no"></i>No puede</span>';
   // quién está en cada área (para «Ver equipo»)
   window.MBAREA={A:A,by:{}};
-  L.forEach(function(p){p.items.forEach(function(i){var k=i.area;(MBAREA.by[k]=MBAREA.by[k]||[]).push({n:p.nombre,id:p.id,d:i.dia,r:!!(i.resp||i.resp2),c:!!(i.resp||i.conf),no:i.st==='no'});});});
+  L.forEach(function(p){p.items.forEach(function(i){var k=i.area;(MBAREA.by[k]=MBAREA.by[k]||[]).push({n:p.nombre,id:p.id,d:i.dia,r:!!(i.resp||i.resp2),c:!!(i.resp||i.conf),no:i.st==='no',t:(p.cm||{})[k+'|'+i.dia+'|t']||''});});});
   // equipos por área (revisión rápida del organizador): toca un área y se abre su equipo
   var eqb=document.getElementById('eqb');
   var S=window.MBS;
@@ -620,7 +637,7 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
     its.map(function(i){var a=A[i.area]||{n:i.area,g:''},dd=DAY[i.dia]||['—',''],pend=!(i.resp||i.conf)&&i.st!=='no';
      var H=HOR[i.area]; if(!H) return '<li class="shift'+(pend?' pend':'')+'"><div class="dy"><b>'+dd[0]+'</b><span>'+dd[1]+'</span></div><div class="tm"><div class="time word tbc">'+(i.dia==='all'?'Todo el evento':'Hora por confirmar')+'</div></div>'+'<div class="wh"><span class="ar">'+esc(i.area)+' · '+esc(a.n)+'</span><span class="cg">'+(i.resp?'Responsable del área':'Voluntario')+'</span>'+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';
      return '<li class="shift asg'+(pend?' pend':'')+(i.st==='no'?' no':'')+'"><div class="dy"><b>'+dd[0]+'</b><span>'+dd[1]+'</span></div><div class="tm"><button type="button" class="aname2 aopen" data-area="'+esc(i.area)+'" title="Ver quién está en esta área">'+esc(a.n)+' <span class="aw">Ver equipo →</span></button><div class="hrs">'+esc(hrsOf(i))+'</div></div>'+
-      '<div class="wh"><span class="cg tk">'+esc(H[1])+'</span>'+(i.pu?'<span class="cf pu">Tu puesto: <b>'+esc(i.pu)+'</b></span>':'')+(i.resp||i.resp2?'<span class="cf rs">Responsable del área</span>':'')+(!i.resp&&!i.resp2&&LONG[i.area]&&!SHORTD[i.area+'|'+i.dia]?'<span class="rot"><b class="rk">Son muchas horas.</b> Cuando tengamos a todo el equipo disponible y confirmado, el responsable del área repartirá <b>turnos y rotaciones</b>.</span>':'')+'<span class="ar">'+esc(i.area)+'</span>'+(i.resp?'':cbox(p,i.area+'|'+i.dia,i.st,0))+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';}).join('')+fiestaLi(p)+'</ol></article>';}).join('')
+      '<div class="wh"><span class="cg tk">'+esc(H[1])+'</span>'+(i.pu?'<span class="cf pu">Tu puesto: <b>'+esc(i.pu)+'</b></span>':'')+(i.resp||i.resp2?'<span class="cf rs">Responsable del área</span>':'')+(!i.resp&&!i.resp2&&LONG[i.area]&&!SHORTD[i.area+'|'+i.dia]&&!tsplit(i)?'<span class="rot"><b class="rk">Son muchas horas.</b> Cuando tengamos a todo el equipo disponible y confirmado, el responsable del área repartirá <b>turnos y rotaciones</b>.</span>':'')+'<span class="ar">'+esc(i.area)+'</span>'+(i.resp?'':cbox(p,i.area+'|'+i.dia,i.st,0,tsplit(i)))+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';}).join('')+fiestaLi(p)+'</ol></article>';}).join('')
    :'<p class="empty" style="display:block">Todavía no hay nadie asignado.</p>';
   if(window.MBsearch) window.MBsearch();
   var lv=document.getElementById('live'); if(lv) lv.textContent='en vivo · '+MB.hm(d.ts);
@@ -630,17 +647,19 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
   var days=['pre','vie','sab','dom'].filter(function(d){return L.some(function(x){return x.d===d;});});
   var h='';days.forEach(function(d){var g=L.filter(function(x){return x.d===d;}).sort(function(x,y){return (y.r-x.r)||x.n.localeCompare(y.n,'es');});
    var dd=DAY[d]||['',''],hr=HOR[c]?(HORD[c+'|'+d]||HOR[c][0]):'';
-   h+='<div class="tg"><div class="tgh"><b>'+dd[0]+' '+dd[1]+'</b>'+(hr?' · '+esc(hr):'')+'<span>'+g.length+' persona'+(g.length===1?'':'s')+'</span></div><ul class="tl2">'+g.map(function(x){return '<li><a href="#'+x.id+'" class="tn">'+esc(x.n)+'</a>'+(x.r?'<span class="tr">Responsable</span>':'')+(x.c?(x.r?'':'<span class="tk2">✓</span>'):x.no?'<span class="tp no">no puede</span>':'<span class="tp">por confirmar</span>')+'</li>';}).join('')+'</ul></div>';});
+   h+='<div class="tg"><div class="tgh"><b>'+dd[0]+' '+dd[1]+'</b>'+(hr?' · '+esc(hr):'')+'<span>'+g.length+' persona'+(g.length===1?'':'s')+'</span></div><ul class="tl2">'+g.map(function(x){return '<li><a href="#'+x.id+'" class="tn">'+esc(x.n)+'</a>'+(x.r?'<span class="tr">Responsable</span>':'')+(x.t&&x.t!=='todo'?'<span class="tp">'+(x.t==='man'?'mañana':'tarde')+'</span>':'')+(x.c?(x.r?'':'<span class="tk2">✓</span>'):x.no?'<span class="tp no">no puede</span>':'<span class="tp">por confirmar</span>')+'</li>';}).join('')+'</ul></div>';});
   document.getElementById('detk').textContent=c+' · equipo del área';document.getElementById('dett').textContent=a.n;
   document.getElementById('detb').innerHTML=(HOR[c]?'<p class="tdesc">'+esc(HOR[c][1])+'</p>':'')+(h||'<p class="tdesc">Todavía no hay nadie en esta área.</p>');
   var dl=document.getElementById('det');dl.hidden=false;document.getElementById('detx').focus();});
  document.getElementById('det').addEventListener('click',function(e){var a=e.target.closest('a.tn');if(a){document.getElementById('det').hidden=true;}});
  document.addEventListener('click',async function(e){var b=e.target.closest('.cbx .cb');if(!b)return;e.preventDefault();
-  var box=b.closest('.cbx'),id=box.dataset.id,k=box.dataset.k,v=b.dataset.v,pk=id+'~'+k;
+  var box=b.closest('.cbx'),id=box.dataset.id,k=box.dataset.k,t=b.dataset.t||'',v=t?'ok':b.dataset.v,pk=id+'~'+k;
+  var hasT=!!box.querySelector('.cb.t')||/\|t$/.test(k)||(LAST&&(LAST.people||[]).some(function(q){var c=q.conf||{};if(typeof c==='string'){try{c=JSON.parse(c||'{}');}catch(_){c={};}}return q.id===id&&c[k+'|t'];}));
   box.querySelectorAll('.cb').forEach(function(x){x.disabled=true;});
   PEND[pk]=v; if(LAST) build(LAST);
-  try{ await MB.call('asig.conf',{id:id,k:k,v:v});
-   (LAST.people||[]).forEach(function(q){if(q.id===id){var c=q.conf||{};if(typeof c==='string'){try{c=JSON.parse(c||'{}');}catch(_){c={};}}if(v)c[k]=v;else delete c[k];q.conf=c;}});
+  try{ if(!(t&&box.dataset.st==='ok')) await MB.call('asig.conf',{id:id,k:k,v:v});
+   if(t||(hasT&&!v)||(hasT&&v==='no')) await MB.call('asig.conf',{id:id,k:k+'|t',v:t});
+   (LAST.people||[]).forEach(function(q){if(q.id===id){var c=q.conf||{};if(typeof c==='string'){try{c=JSON.parse(c||'{}');}catch(_){c={};}}if(v)c[k]=v;else delete c[k];if(t)c[k+'|t']=t;else delete c[k+'|t'];q.conf=c;}});
    delete PEND[pk]; build(LAST); if(MB.toast) MB.toast(v==='ok'||v==='si'?'¡Gracias! Guardado':v==='no'?'Guardado · te escribiremos':'Respuesta borrada');
   }catch(err){ delete PEND[pk]; if(LAST) build(LAST); if(MB.toast) MB.toast('No se ha podido guardar. Prueba otra vez.'); }
  });
