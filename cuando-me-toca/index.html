@@ -553,15 +553,15 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
  var PEND={}, LAST=null;
  var WA='https://wa.me/34643455398';
  // caja de confirmación de cada área: el voluntario clica y se guarda en su fila (asig.conf)
- // turnos (01/11): en horarios largos (6 h o más, menos marshals) el voluntario elige todo / mañana / tarde → conf["A01|vie|t"]="todo"|"man"|"tar"
- var NOTURNO={A19:1,A21:1,A24:1,A25:1}, TN={todo:'Todo el horario',man:'Solo turno de mañana',tar:'Solo turno de tarde'};
+ // turnos (01/11): donde pone «son muchas horas» (menos marshals de ruta A19/A21 y quien ya tiene un puesto con hora) el voluntario elige todo / turno 1 / turno 2 → conf["A01|vie|t"]="todo"|"man"(turno 1)|"tar"(turno 2); corte en la mitad, redondeado a la media hora
+ var NOTURNO={A19:1,A21:1}, TN={todo:'Todo el horario',man:'Solo turno 1',tar:'Solo turno 2'};
  function mm(x){var q=x.split(':');return +q[0]*60+(+q[1]);}
  function hh(m){m=((m%1440)+1440)%1440;return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+m%60).slice(-2);}
- function tsplit(i){if(NOTURNO[i.area]||!LONG[i.area]||SHORTD[i.area+'|'+i.dia]||!HOR[i.area])return null;
+ function tsplit(i){if(NOTURNO[i.area]||!LONG[i.area]||SHORTD[i.area+'|'+i.dia]||!HOR[i.area]||/\d\d:\d\d\s*[–-]\s*\d\d:\d\d/.test(i.pu||''))return null;
   var h=(hrsOf(i)||'').match(/(\d\d:\d\d)\s*[–-]\s*(\d\d:\d\d)/);if(!h)return null;
-  var a=mm(h[1]),b=mm(h[2]);if(b<a)b+=1440;if(b-a<360)return null;
-  var c=(a<840&&b>840)?840:Math.round((a+b)/120)*60;return {m:h[1]+'–'+hh(c),t:hh(c)+'–'+h[2]};}
- function tbtns(T,cls){return '<button type="button" class="cb t'+cls+'" data-t="todo">Todo el horario</button><button type="button" class="cb t'+cls+'" data-t="man">Solo mañana<small>'+T.m+'</small></button><button type="button" class="cb t'+cls+'" data-t="tar">Solo tarde<small>'+T.t+'</small></button>';}
+  var a=mm(h[1]),b=mm(h[2]);if(b<a)b+=1440;if(b-a<120)return null;
+  var c=Math.round((a+b)/60)*30;return {m:h[1]+'–'+hh(c),t:hh(c)+'–'+h[2]};}
+ function tbtns(T,cls){return '<button type="button" class="cb t'+cls+'" data-t="todo">Todo el horario</button><button type="button" class="cb t'+cls+'" data-t="man">Turno 1<small>'+T.m+'</small></button><button type="button" class="cb t'+cls+'" data-t="tar">Turno 2<small>'+T.t+'</small></button>';}
  function cbox(p,k,st,com,T){if(!p.aid)return '';
   var b=' data-id="'+esc(p.aid)+'" data-k="'+esc(k)+'"';
   if(com){
@@ -647,7 +647,7 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
   var days=['pre','vie','sab','dom'].filter(function(d){return L.some(function(x){return x.d===d;});});
   var h='';days.forEach(function(d){var g=L.filter(function(x){return x.d===d;}).sort(function(x,y){return (y.r-x.r)||x.n.localeCompare(y.n,'es');});
    var dd=DAY[d]||['',''],hr=HOR[c]?(HORD[c+'|'+d]||HOR[c][0]):'';
-   h+='<div class="tg"><div class="tgh"><b>'+dd[0]+' '+dd[1]+'</b>'+(hr?' · '+esc(hr):'')+'<span>'+g.length+' persona'+(g.length===1?'':'s')+'</span></div><ul class="tl2">'+g.map(function(x){return '<li><a href="#'+x.id+'" class="tn">'+esc(x.n)+'</a>'+(x.r?'<span class="tr">Responsable</span>':'')+(x.t&&x.t!=='todo'?'<span class="tp">'+(x.t==='man'?'mañana':'tarde')+'</span>':'')+(x.c?(x.r?'':'<span class="tk2">✓</span>'):x.no?'<span class="tp no">no puede</span>':'<span class="tp">por confirmar</span>')+'</li>';}).join('')+'</ul></div>';});
+   h+='<div class="tg"><div class="tgh"><b>'+dd[0]+' '+dd[1]+'</b>'+(hr?' · '+esc(hr):'')+'<span>'+g.length+' persona'+(g.length===1?'':'s')+'</span></div><ul class="tl2">'+g.map(function(x){return '<li><a href="#'+x.id+'" class="tn">'+esc(x.n)+'</a>'+(x.r?'<span class="tr">Responsable</span>':'')+(x.t&&x.t!=='todo'?'<span class="tp">'+(x.t==='man'?'turno 1':'turno 2')+'</span>':'')+(x.c?(x.r?'':'<span class="tk2">✓</span>'):x.no?'<span class="tp no">no puede</span>':'<span class="tp">por confirmar</span>')+'</li>';}).join('')+'</ul></div>';});
   document.getElementById('detk').textContent=c+' · equipo del área';document.getElementById('dett').textContent=a.n;
   document.getElementById('detb').innerHTML=(HOR[c]?'<p class="tdesc">'+esc(HOR[c][1])+'</p>':'')+(h||'<p class="tdesc">Todavía no hay nadie en esta área.</p>');
   var dl=document.getElementById('det');dl.hidden=false;document.getElementById('detx').focus();});
