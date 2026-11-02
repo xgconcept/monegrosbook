@@ -62,6 +62,7 @@ details.card summary{cursor:pointer;font:800 20px var(--ft);text-transform:upper
 .note{font-size:13px;color:var(--sub)}
 .hint{font-size:13px;color:var(--sub);margin:4px 0 0}
 .vie{display:grid;gap:6px;margin-top:10px}.vie button{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;text-align:left;font:600 14.5px var(--fx);padding:11px 12px;border-radius:8px;border:1.5px solid var(--hair);background:var(--panel);color:var(--ink);cursor:pointer}.vie button small{font:500 12px var(--fm);color:var(--sub)}.vie button[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:#fff}.vie button[aria-pressed="true"] small{color:#fff}
+.vno{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--amb-soft);border:1.5px solid var(--amb);font-size:14px}
 .pu{display:inline-block;font:700 11px var(--fm);background:var(--amb-soft);color:var(--amb);padding:3px 7px;border-radius:4px;margin-top:6px}
 [hidden]{display:none!important}
 @media (max-width:480px){.types button{font-size:15px}.row2{grid-template-columns:1fr}}
@@ -105,15 +106,17 @@ details.card summary{cursor:pointer;font:800 20px var(--ft);text-transform:upper
   <label class="f" for="tel">Teléfono móvil (el que llevarás en ruta)</label><input class="in" id="tel" type="tel" inputmode="tel" maxlength="20" autocomplete="tel"><p class="hint" id="telh" hidden>Es el que nos diste al apuntarte. Si en ruta llevas otro, cámbialo.</p>
  </section>
 
- <section class="card"><p class="step">Paso 2</p><h2>¿A qué hora tienes previsto llegar el viernes?</h2>
-  <p class="hint">Os necesitamos el sábado, pero el viernes 6 revisaremos material y os explicaremos cosas según a qué hora lleguéis. Elige cuándo llegas el viernes.</p>
+ <section class="card"><p class="step">Paso 2</p><h2>El viernes, antes de las 15:00</h2>
+  <p class="hint"><b>Necesitamos que estés el viernes 6 antes de las 15:00.</b> Por la tarde hay muchas actividades y ya no podremos explicarte con calma tu puesto ni lo que necesitamos de ti. Si llegas pronto, te pondremos también a revisar material. ¿A qué hora llegas?</p>
   <div class="vie" id="vie" role="group" aria-label="Llegada el viernes">
-   <button type="button" data-vie="pronto" aria-pressed="false">Pronto por la mañana<small>antes de las 9:00</small></button>
-   <button type="button" data-vie="manana" aria-pressed="false">Durante la mañana<small>de 9:00 a 12:00</small></button>
-   <button type="button" data-vie="mediodia" aria-pressed="false">A mediodía<small>de 12:00 a 15:00</small></button>
-   <button type="button" data-vie="tarde" aria-pressed="false">Por la tarde<small>de 15:00 a 19:00</small></button>
-   <button type="button" data-vie="noche" aria-pressed="false">Por la noche<small>después de las 19:00</small></button>
-   <button type="button" data-vie="no" aria-pressed="false">El viernes no puedo<small>llego el sábado</small></button>
+   <button type="button" data-vie="pronto" aria-pressed="false">Pronto<small>antes de las 9:00</small></button>
+   <button type="button" data-vie="m1" aria-pressed="false">Primera hora de la mañana<small>de 9:00 a 10:30</small></button>
+   <button type="button" data-vie="m2" aria-pressed="false">Media mañana<small>de 10:30 a 12:00</small></button>
+   <button type="button" data-vie="mediodia" aria-pressed="false">Mediodía<small>de 12:00 a 15:00</small></button>
+   <button type="button" data-vie="no" aria-pressed="false">No puedo llegar antes de las 15:00<small>avísanos</small></button>
+  </div>
+  <div class="vno" id="vno" hidden><b>Avísanos con tiempo.</b> Te llamaremos antes del viernes para explicarte lo que necesitamos de ti: ir a ciegas en la ruta sin las consignas no puede ser.
+   <label class="f" for="vieh">¿A qué hora llegarías el viernes (o el sábado)?</label><input class="in" id="vieh" maxlength="80" placeholder="p. ej. viernes a las 18:00"></div>
   </div>
  </section>
 
@@ -197,7 +200,7 @@ var ORG = { moto: ['Gasolina', 'Raciones de comida', 'Agua', 'Barritas energéti
 
 var esc = MB.esc, $ = function (i) { return document.getElementById(i); };
 var S = { id: '', nombre: '', tipo: '', lock: '', ck: {}, vie: '' }, PEOPLE = [], REQ = 0;
-function paintVie() { document.querySelectorAll('[data-vie]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.vie === S.vie)); }); }
+function paintVie() { document.querySelectorAll('[data-vie]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.vie === S.vie)); }); $('vno').hidden = S.vie !== 'no'; }
 function itemsOf(t) { var o = []; (LIST[t] || []).forEach(function (g) { g[1].forEach(function (x) { o.push(x); }); }); return o; }
 // tipo asignado (02/11): sale del puesto que le hemos dado (reparto de Viladoms) o del área médica; si no hay, elige moto o coche (medical nunca se elige)
 function tipoFijo(pu, areas) { if (areas.indexOf('A20') >= 0 || /medical|m[eé]dic/i.test(pu)) return 'medical'; if (/\bmoto\b/i.test(pu)) return 'moto'; if (/4x4|coche|charly|alpha|sprinter|furgo/i.test(pu)) return 'coche'; return ''; }
@@ -229,7 +232,7 @@ $('who').addEventListener('change', async function () {
  var v = this.value, tok = ++REQ; $('otro').hidden = v !== '__otro'; $('pu').innerHTML = '';
  // al cambiar de nombre todo vuelve a cero (02/11)
  S.id = ''; S.nombre = ''; S.lock = ''; $('telh').hidden = true; S.tipo = ''; S.ck = {}; S.vie = ''; paintVie(); $('prev').hidden = true; $('miss').hidden = true; $('eqc').hidden = true;
- ['tel', 'vm', 'mat', 'pl', 'obs', 'nom'].forEach(function (k) { $(k).value = ''; });
+ ['tel', 'vm', 'mat', 'pl', 'obs', 'nom', 'vieh'].forEach(function (k) { $(k).value = ''; });
  if (!v || v === '__otro') { renderList(); return; }
  var p = PEOPLE.filter(function (x) { return x.id === v; })[0]; S.id = v; S.nombre = p.nombre;
  if (p.pu) $('pu').innerHTML = '<span class="pu">Tu puesto: ' + esc(p.pu) + '</span>';
@@ -246,18 +249,18 @@ $('who').addEventListener('change', async function () {
   if (j.pco) document.querySelectorAll('[data-pco]').forEach(function (e) { var t = j.pco[e.dataset.pco]; e.innerHTML = t ? ' · <a href="tel:' + esc(t.replace(/\s/g, '')) + '">' + esc(t) + '</a>' : ''; });
   if (j.m) fill(j.m); } catch (err) {}
 });
-function fill(m) { var d = m.datos || {}; S.tipo = S.lock || (m.tipo === 'medical' ? '' : m.tipo) || S.tipo; S.ck = d.ck || {}; S.vie = d.vie || ''; paintVie(); $('tel').value = d.tel || $('tel').value || ''; $('vm').value = d.veh || ''; $('mat').value = d.mat || ''; $('pl').value = d.plazas == null ? '' : d.plazas; $('obs').value = d.obs || ''; renderList();
+function fill(m) { var d = m.datos || {}; S.tipo = S.lock || (m.tipo === 'medical' ? '' : m.tipo) || S.tipo; S.ck = d.ck || {}; S.vie = d.vie || ''; $('vieh').value = d.vieh || ''; paintVie(); $('tel').value = d.tel || $('tel').value || ''; $('vm').value = d.veh || ''; $('mat').value = d.mat || ''; $('pl').value = d.plazas == null ? '' : d.plazas; $('obs').value = d.obs || ''; renderList();
  var f = String(m.actualizado || '').match(/(\d{4})-(\d\d)-(\d\d)\s+(\d\d:\d\d)/);
  $('prev').innerHTML = '✓ <b>Ya contestaste' + (f ? ' el ' + f[3] + '/' + f[2] + ' a las ' + f[4] : '') + '.</b> Puedes cambiar lo que quieras y volver a enviar.'; $('prev').hidden = false; }
 
 $('send').addEventListener('click', async function () {
  var nombre = S.id ? S.nombre : $('nom').value.trim(), id = S.id || (nombre ? 'm-' + MB.slug(nombre) : '');
  var falta = [];
- if (!nombre) falta.push('tu nombre'); if (!$('tel').value.trim()) falta.push('el teléfono'); if (!S.vie) falta.push('a qué hora puedes estar el viernes'); if (!S.tipo) falta.push('cómo vas');
+ if (!nombre) falta.push('tu nombre'); if (!$('tel').value.trim()) falta.push('el teléfono'); if (!S.vie) falta.push('a qué hora llegas el viernes'); else if (S.vie === 'no' && !$('vieh').value.trim()) falta.push('a qué hora llegarías'); if (!S.tipo) falta.push('cómo vas');
  var sin = itemsOf(S.tipo).filter(function (x) { return !S.ck[x[0]]; }).length; if (sin) falta.push(sin + (sin === 1 ? ' punto' : ' puntos') + ' de la lista');
  if (falta.length) { $('miss').textContent = 'Falta: ' + falta.join(', ') + '.'; $('miss').hidden = false; return; }
  var ck = {}; itemsOf(S.tipo).forEach(function (x) { ck[x[0]] = S.ck[x[0]]; });
- var datos = { vie: S.vie, tel: $('tel').value.trim(), veh: $('vm').value.trim(), mat: $('mat').value.trim().toUpperCase(), plazas: S.tipo === 'moto' ? null : ($('pl').value === '' ? null : +$('pl').value), ck: ck, obs: $('obs').value.trim(), lista: !S.id ? 'añadido por el marshal' : '' };
+ var datos = { vie: S.vie, vieh: S.vie === 'no' ? $('vieh').value.trim() : '', tel: $('tel').value.trim(), veh: $('vm').value.trim(), mat: $('mat').value.trim().toUpperCase(), plazas: S.tipo === 'moto' ? null : ($('pl').value === '' ? null : +$('pl').value), ck: ck, obs: $('obs').value.trim(), lista: !S.id ? 'añadido por el marshal' : '' };
  this.disabled = true; this.textContent = 'Guardando…';
  try { await MB.call('mar.set', { id: id, nombre: nombre, tipo: S.tipo, datos: datos }); done(nombre); resumen(); }
  catch (err) { MB.toast('No se ha podido guardar. Prueba otra vez.'); }
