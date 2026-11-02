@@ -295,6 +295,7 @@ function suggest(v){
 let vols=[], asg={}, st={tab:"vol",q:"",estado:null,day:null,veh:null,task:null}, openAdd=null, openArea=null, showUn=false;
 let dbOk=false, lastSync=null;
 try{const t=localStorage.getItem("mbv_tab"); if(t==="area"||t==="mar")st.tab=t;}catch(e){}
+if(/[?&]tab=marshals?\b/.test(location.search))st.tab="mar";
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
