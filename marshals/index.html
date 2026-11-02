@@ -145,7 +145,7 @@ details.card summary{cursor:pointer;font:800 20px var(--ft);text-transform:upper
 var CFG = {
  grupo: 'https://chat.whatsapp.com/HNu4pIHw4694vkyjpbJkAA',   // enlace del grupo de WhatsApp de marshals
  limite: 'miércoles 4 de noviembre',
- areas: ['A19', 'A20', 'A21']     // salen en la lista: Ruta Off-Road, Médico, Ruta On-Road
+ areas: ['A19', 'A20']     // salen en la lista: Ruta Off-Road y Médico del sábado (On-Road fuera, 02/11)
 };
 // Lista de Jordi Viladoms (02/11). pide = se puede pedir a la organización.
 var LIST = {
@@ -259,7 +259,7 @@ async function resumen() { try { var r = (await MB.call('mar.res')).res; $('rm')
 MB.gate({ need: 'any', title: 'Marshals', label: 'Clave de voluntarios' }).then(async function () {
  try {
   var t = await MB.call('tablon'), by = {};
-  // marshals del sábado (A19, A20) y On-Road (A21); el PCO no rellena el formulario
+  // marshals del sábado (A19, A20); el PCO no rellena el formulario
   (t.people || []).forEach(function (v) { var its = (v.items || []).filter(function (i) { return CFG.areas.indexOf(i.area) >= 0 && (i.dia === 'sab' || i.area === 'A21') && !/^PCO\b/.test(i.puesto || ''); }); if (!its.length) return;
    by[v.id] = { id: v.id, nombre: v.nombre, areas: its.map(function (i) { return i.area; }), pu: its.map(function (i) { return i.puesto || ''; }).filter(Boolean).join(' · ') }; });
   PEOPLE = Object.keys(by).map(function (k) { return by[k]; }).sort(function (a, b) { return a.nombre.localeCompare(b.nombre, 'es'); });
