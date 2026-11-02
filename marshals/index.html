@@ -71,6 +71,13 @@ details.card summary{cursor:pointer;font:800 20px var(--ft);text-transform:upper
  <section class="hero"><div class="k">Marshals · 7 de noviembre</div><h1>Antes de entrar al grupo</h1>
   <p>Necesitamos saber cómo vienes y qué llevas para organizar la ruta y el material. Son 2 minutos. Al terminar te sale el botón del grupo de WhatsApp de marshals.</p></section>
 
+ <section class="card reg" style="border:2px solid var(--amarillo)"><h2>Antes de empezar</h2>
+  <ul>
+   <li>Lo que verás aquí es el <b>plan inicial</b> de Jordi Viladoms: una base de lo que queremos que hagas. No es definitivo. Lo iremos ajustando con lo que nos contestéis en este formulario, y por eso os pedimos tanta información.</li>
+   <li>El <b>viernes</b> haremos una <b>reunión con todos los marshals</b> para acabar de explicar el plan y resolver las dudas. La hora la pondremos en el grupo de WhatsApp.</li>
+   <li>Cuando llegues por primera vez al evento, ve a <b>Inscripciones</b> (Pabellón del Sotet, Fraga) y pregunta por <b>Jordi Viladoms</b> si eres marshal o por <b>Xavi Galindo</b> si eres voluntario. Te darán los últimos detalles. <a href="https://www.google.com/maps/search/?api=1&amp;query=41.516972,0.348134" target="_blank" rel="noopener">Ver la ubicación en Google Maps</a></li>
+  </ul></section>
+
  <section class="res" id="res" hidden><h2>Confirmados hasta ahora</h2><div class="g">
   <div><b id="rm">0</b><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M12 17h-1l-3-6h5l3 4h3"/><path d="M14 7h2l3 6"/><path d="M8 11 6 8H3"/></svg>en moto</span><small id="pm"></small></div>
   <div><b id="rc">0</b><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16V11l2-5h10l4 5h2v5"/><path d="M3 16h18"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 11h14"/></svg>en 4x4 / coche</span><small id="pc"></small></div>
@@ -215,7 +222,7 @@ $('who').addEventListener('change', async function () {
  if (q) $('eqc').innerHTML = '<div class="t">' + esc(q.eq) + '<small>' + esc(q.rol) + '</small></div><dl>' +
   (q.comp && q.comp !== '—' ? '<dt>Con</dt><dd>' + esc(q.comp) + '<span id="ctel"></span></dd>' : '') + (q.veh && q.veh !== '—' ? '<dt>Vehículo</dt><dd>' + esc(q.veh) + '</dd>' : '') +
   '<dt>Tu día</dt><dd>' + esc(q.ruta) + '</dd>' + (q.sale !== '—' ? '<dt>Horario</dt><dd>Sales de Base a las <b>' + esc(q.sale) + '</b>' + (q.vuelve !== '—' ? ' · vuelves hacia las <b>' + esc(q.vuelve) + '</b>' : '') + '</dd>' : '') +
-  (q.km ? '<dt>Km</dt><dd>' + esc(q.km) + '</dd>' : '') + '</dl><p class="hint">Plan de Jordi Viladoms. El día manda el PCO.</p>';
+  (q.km ? '<dt>Km</dt><dd>' + esc(q.km) + '</dd>' : '') + '</dl><p class="hint">Plan inicial de Jordi Viladoms: lo ajustaremos con vuestras respuestas y en la reunión del viernes. El día manda el PCO.</p>';
  S.lock = tipoFijo(p.pu, p.areas); S.tipo = S.lock || ''; renderList();
  try { var j = await MB.call('mar.get', { id: v, cid: q && q.cid || '' }); if (tok !== REQ) return;
   // teléfonos del formulario de voluntarios (02/11): salen solos, se pueden cambiar
