@@ -27,10 +27,12 @@ h3{font-family:var(--ft);font-weight:700;font-size:18px;text-transform:uppercase
 label.f{display:block;font:600 12.5px var(--fx);color:var(--sub);margin:10px 0 4px}
 input.in,select.in,textarea.in{width:100%;font:16px var(--fx);padding:11px 12px;border:1.5px solid var(--hair);border-radius:8px;background:var(--panel);color:var(--ink)}
 textarea.in{min-height:70px;resize:vertical}
-.types{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.types{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .types button{font-family:var(--ft);font-weight:800;font-size:18px;text-transform:uppercase;padding:14px 6px;border-radius:10px;border:2px solid var(--hair);background:var(--panel);color:var(--ink);cursor:pointer;line-height:1.1}
 .types button span{display:block;font-size:28px;margin-bottom:4px}
 .types button[aria-pressed="true"]{border-color:var(--azul);background:var(--azul);color:#fff}
+.types.fijo{grid-template-columns:1fr}.types.dos{grid-template-columns:1fr 1fr}
+.asig{display:block;font:600 13px var(--fx);color:var(--ok);margin:8px 0 0}
 .it{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--hair)}
 .it:first-of-type{border-top:0}
 .it .tx{flex:1 1 260px;font-size:14.5px}.it .tx small{display:block;color:var(--sub);font-size:12.5px}
@@ -69,8 +71,9 @@ textarea.in{min-height:70px;resize:vertical}
   <div class="types" role="group" aria-label="Tipo de marshal">
    <button type="button" data-tipo="moto" aria-pressed="false"><span>🏍️</span>Moto</button>
    <button type="button" data-tipo="coche" aria-pressed="false"><span>🚙</span>Coche / 4x4</button>
-   <button type="button" data-tipo="medical" aria-pressed="false"><span>🚑</span>Medical</button>
+   <button type="button" data-tipo="medical" aria-pressed="false" hidden><span>🚑</span>Medical</button>
   </div>
+  <span class="asig" id="asig" hidden>✓ Asignado por la organización según tu puesto</span>
   <div id="veh" hidden>
    <div class="row2"><div><label class="f" for="vm">Vehículo (marca y modelo)</label><input class="in" id="vm" maxlength="60"></div>
    <div><label class="f" for="mat">Matrícula</label><input class="in" id="mat" maxlength="12" autocapitalize="characters"></div></div>
@@ -140,14 +143,17 @@ LIST.medical = LIST.coche.concat([['Material médico', [['med', 'Material médic
 var ORG = { moto: ['Gasolina', 'Raciones de comida', 'Agua', 'Barritas energéticas'], coche: ['Raciones de comida', 'Agua'], medical: ['Raciones de comida', 'Agua'] };
 
 var esc = MB.esc, $ = function (i) { return document.getElementById(i); };
-var S = { id: '', nombre: '', tipo: '', ck: {} }, PEOPLE = [];
+var S = { id: '', nombre: '', tipo: '', lock: '', ck: {} }, PEOPLE = [];
 function itemsOf(t) { var o = []; (LIST[t] || []).forEach(function (g) { g[1].forEach(function (x) { o.push(x); }); }); return o; }
-function guessTipo(pu, areas) { if (areas.indexOf('A20') >= 0) return 'medical'; if (/moto/i.test(pu)) return 'moto'; if (/4x4|coche|charly|alpha/i.test(pu)) return 'coche'; return ''; }
+// tipo asignado (02/11): sale del puesto que le hemos dado (reparto de Viladoms) o del área médica; si no hay, elige moto o coche (medical nunca se elige)
+function tipoFijo(pu, areas) { if (areas.indexOf('A20') >= 0 || /medical|m[eé]dic/i.test(pu)) return 'medical'; if (/\bmoto\b/i.test(pu)) return 'moto'; if (/4x4|coche|charly|alpha/i.test(pu)) return 'coche'; return ''; }
 
 function renderList() {
  var t = S.tipo; $('chk').hidden = !t; $('fin').hidden = !t; $('veh').hidden = !t; $('plz').hidden = t === 'moto' || !t;
  $('vm').placeholder = t === 'moto' ? 'p. ej. KTM 690 Enduro' : 'p. ej. Toyota Land Cruiser';
- document.querySelectorAll('[data-tipo]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.tipo === t)); });
+ document.querySelectorAll('[data-tipo]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.tipo === t)); b.hidden = S.lock ? b.dataset.tipo !== S.lock : b.dataset.tipo === 'medical'; b.disabled = !!S.lock; });
+ var ty = document.querySelector('.types'); ty.classList.toggle('fijo', !!S.lock); ty.classList.toggle('dos', !S.lock);
+ $('asig').hidden = !S.lock;
  if (!t) return;
  $('list').innerHTML = LIST[t].map(function (g) {
   return '<h3>' + esc(g[0]) + '</h3>' + g[1].map(function (x) {
@@ -161,18 +167,18 @@ function renderList() {
  $('org').innerHTML = '<b>Lo pone la organización</b><ul>' + ORG[t].map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
 }
 document.addEventListener('click', function (e) {
- var b = e.target.closest('[data-tipo]'); if (b) { S.tipo = b.dataset.tipo; renderList(); return; }
+ var b = e.target.closest('[data-tipo]'); if (b) { if (S.lock) return; S.tipo = b.dataset.tipo; renderList(); return; }
  var o = e.target.closest('.op button[data-v]'); if (o) { var k = o.closest('.it').dataset.k; S.ck[k] = o.dataset.v; o.parentNode.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === o)); }); $('miss').hidden = true; }
 });
 $('who').addEventListener('change', async function () {
  var v = this.value; $('otro').hidden = v !== '__otro'; $('pu').innerHTML = '';
- if (!v || v === '__otro') { S.id = ''; return; }
+ if (!v || v === '__otro') { S.id = ''; S.lock = ''; if (S.tipo === 'medical') S.tipo = ''; renderList(); return; }
  var p = PEOPLE.filter(function (x) { return x.id === v; })[0]; S.id = v; S.nombre = p.nombre;
  if (p.pu) $('pu').innerHTML = '<span class="pu">Tu puesto: ' + esc(p.pu) + '</span>';
- S.tipo = S.tipo || guessTipo(p.pu, p.areas); renderList();
+ S.lock = tipoFijo(p.pu, p.areas); S.tipo = S.lock || ''; S.ck = {}; renderList();
  try { var j = await MB.call('mar.get', { id: v }); if (j.m) fill(j.m); } catch (err) {}
 });
-function fill(m) { var d = m.datos || {}; S.tipo = m.tipo || S.tipo; S.ck = d.ck || {}; $('tel').value = d.tel || ''; $('vm').value = d.veh || ''; $('mat').value = d.mat || ''; $('pl').value = d.plazas == null ? '' : d.plazas; $('obs').value = d.obs || ''; renderList(); }
+function fill(m) { var d = m.datos || {}; S.tipo = S.lock || (m.tipo === 'medical' ? '' : m.tipo) || S.tipo; S.ck = d.ck || {}; $('tel').value = d.tel || ''; $('vm').value = d.veh || ''; $('mat').value = d.mat || ''; $('pl').value = d.plazas == null ? '' : d.plazas; $('obs').value = d.obs || ''; renderList(); }
 
 $('send').addEventListener('click', async function () {
  var nombre = S.id ? S.nombre : $('nom').value.trim(), id = S.id || (nombre ? 'm-' + MB.slug(nombre) : '');
