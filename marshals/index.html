@@ -61,6 +61,7 @@ details.card summary{cursor:pointer;font:800 20px var(--ft);text-transform:upper
 .wa{display:block;text-align:center;text-decoration:none;font-family:var(--ft);font-weight:800;font-size:21px;text-transform:uppercase;padding:15px;border-radius:10px;background:#25D366;color:#fff;margin:14px 0 6px}
 .note{font-size:13px;color:var(--sub)}
 .hint{font-size:13px;color:var(--sub);margin:4px 0 0}
+.vie{display:grid;gap:6px;margin-top:10px}.vie button{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;text-align:left;font:600 14.5px var(--fx);padding:11px 12px;border-radius:8px;border:1.5px solid var(--hair);background:var(--panel);color:var(--ink);cursor:pointer}.vie button small{font:500 12px var(--fm);color:var(--sub)}.vie button[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:#fff}.vie button[aria-pressed="true"] small{color:#fff}
 .pu{display:inline-block;font:700 11px var(--fm);background:var(--amb-soft);color:var(--amb);padding:3px 7px;border-radius:4px;margin-top:6px}
 [hidden]{display:none!important}
 @media (max-width:480px){.types button{font-size:15px}.row2{grid-template-columns:1fr}}
@@ -104,7 +105,19 @@ details.card summary{cursor:pointer;font:800 20px var(--ft);text-transform:upper
   <label class="f" for="tel">Teléfono móvil (el que llevarás en ruta)</label><input class="in" id="tel" type="tel" inputmode="tel" maxlength="20" autocomplete="tel"><p class="hint" id="telh" hidden>Es el que nos diste al apuntarte. Si en ruta llevas otro, cámbialo.</p>
  </section>
 
- <section class="card"><p class="step">Paso 2</p><h2>¿Cómo vas?</h2>
+ <section class="card"><p class="step">Paso 2</p><h2>¿Podrás estar el viernes?</h2>
+  <p class="hint">Os necesitamos el sábado, pero el viernes 6 tenemos que explicar cosas y revisar material con algunos de vosotros. Dinos a partir de qué hora puedes estar el viernes.</p>
+  <div class="vie" id="vie" role="group" aria-label="Llegada el viernes">
+   <button type="button" data-vie="pronto" aria-pressed="false">Pronto por la mañana<small>antes de las 9:00</small></button>
+   <button type="button" data-vie="manana" aria-pressed="false">Durante la mañana<small>de 9:00 a 12:00</small></button>
+   <button type="button" data-vie="mediodia" aria-pressed="false">A mediodía<small>de 12:00 a 15:00</small></button>
+   <button type="button" data-vie="tarde" aria-pressed="false">Por la tarde<small>de 15:00 a 19:00</small></button>
+   <button type="button" data-vie="noche" aria-pressed="false">Por la noche<small>después de las 19:00</small></button>
+   <button type="button" data-vie="no" aria-pressed="false">El viernes no puedo<small>llego el sábado</small></button>
+  </div>
+ </section>
+
+ <section class="card"><p class="step">Paso 3</p><h2>¿Cómo vas?</h2>
   <div class="types" role="group" aria-label="Tipo de marshal">
    <button type="button" data-tipo="moto" aria-pressed="false"><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M12 17h-1l-3-6h5l3 4h3"/><path d="M14 7h2l3 6"/><path d="M8 11 6 8H3"/></svg></span>Moto</button>
    <button type="button" data-tipo="coche" aria-pressed="false"><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16V11l2-5h10l4 5h2v5"/><path d="M3 16h18"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 11h14"/></svg></span>Coche / 4x4</button>
@@ -118,13 +131,13 @@ details.card summary{cursor:pointer;font:800 20px var(--ft);text-transform:upper
   </div>
  </section>
 
- <section class="card" id="chk" hidden><p class="step">Paso 3</p><h2>Lo que tienes que llevar</h2>
+ <section class="card" id="chk" hidden><p class="step">Paso 4</p><h2>Lo que tienes que llevar</h2>
   <p class="hint">Marca cada punto. Si te falta algo, dínoslo ahora y lo resolvemos antes del sábado.</p>
   <div id="list"></div>
   <div class="org" id="org"></div>
  </section>
 
- <section class="card" id="fin" hidden><p class="step">Paso 4</p><h2>¿Algo más?</h2>
+ <section class="card" id="fin" hidden><p class="step">Paso 5</p><h2>¿Algo más?</h2>
   <label class="f" for="obs">Dudas, avisos o lo que quieras contarnos</label><textarea class="in" id="obs" maxlength="600"></textarea>
   <p class="miss" id="miss" hidden></p>
   <button class="go" type="button" id="send">Enviar y entrar al grupo</button>
@@ -183,7 +196,8 @@ var PLANTOT = { moto: 10, coche: 11, medical: 4 };
 var ORG = { moto: ['Raciones de comida', 'Agua', 'Barritas energéticas'], coche: ['Raciones de comida', 'Agua'], medical: ['Raciones de comida', 'Agua'] };
 
 var esc = MB.esc, $ = function (i) { return document.getElementById(i); };
-var S = { id: '', nombre: '', tipo: '', lock: '', ck: {} }, PEOPLE = [], REQ = 0;
+var S = { id: '', nombre: '', tipo: '', lock: '', ck: {}, vie: '' }, PEOPLE = [], REQ = 0;
+function paintVie() { document.querySelectorAll('[data-vie]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.vie === S.vie)); }); }
 function itemsOf(t) { var o = []; (LIST[t] || []).forEach(function (g) { g[1].forEach(function (x) { o.push(x); }); }); return o; }
 // tipo asignado (02/11): sale del puesto que le hemos dado (reparto de Viladoms) o del área médica; si no hay, elige moto o coche (medical nunca se elige)
 function tipoFijo(pu, areas) { if (areas.indexOf('A20') >= 0 || /medical|m[eé]dic/i.test(pu)) return 'medical'; if (/\bmoto\b/i.test(pu)) return 'moto'; if (/4x4|coche|charly|alpha|sprinter|furgo/i.test(pu)) return 'coche'; return ''; }
@@ -207,13 +221,14 @@ function renderList() {
  $('org').innerHTML = '<b>Lo pone la organización</b><ul>' + ORG[t].map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul><p class="hint">Lo ponemos nosotros y os lo entregamos a todos. Lo único que pagáis es la <b>gasolina</b>: guardad el ticket y os lo pagamos al terminar.</p>';
 }
 document.addEventListener('click', function (e) {
+ var vb = e.target.closest('[data-vie]'); if (vb) { S.vie = vb.dataset.vie; paintVie(); $('miss').hidden = true; return; }
  var b = e.target.closest('[data-tipo]'); if (b) { if (S.lock) return; S.tipo = b.dataset.tipo; renderList(); return; }
  var o = e.target.closest('.op button[data-v]'); if (o) { var k = o.closest('.it').dataset.k; S.ck[k] = o.dataset.v; o.parentNode.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === o)); }); $('miss').hidden = true; }
 });
 $('who').addEventListener('change', async function () {
  var v = this.value, tok = ++REQ; $('otro').hidden = v !== '__otro'; $('pu').innerHTML = '';
  // al cambiar de nombre todo vuelve a cero (02/11)
- S.id = ''; S.nombre = ''; S.lock = ''; $('telh').hidden = true; S.tipo = ''; S.ck = {}; $('prev').hidden = true; $('miss').hidden = true; $('eqc').hidden = true;
+ S.id = ''; S.nombre = ''; S.lock = ''; $('telh').hidden = true; S.tipo = ''; S.ck = {}; S.vie = ''; paintVie(); $('prev').hidden = true; $('miss').hidden = true; $('eqc').hidden = true;
  ['tel', 'vm', 'mat', 'pl', 'obs', 'nom'].forEach(function (k) { $(k).value = ''; });
  if (!v || v === '__otro') { renderList(); return; }
  var p = PEOPLE.filter(function (x) { return x.id === v; })[0]; S.id = v; S.nombre = p.nombre;
@@ -231,18 +246,18 @@ $('who').addEventListener('change', async function () {
   if (j.pco) document.querySelectorAll('[data-pco]').forEach(function (e) { var t = j.pco[e.dataset.pco]; e.innerHTML = t ? ' · <a href="tel:' + esc(t.replace(/\s/g, '')) + '">' + esc(t) + '</a>' : ''; });
   if (j.m) fill(j.m); } catch (err) {}
 });
-function fill(m) { var d = m.datos || {}; S.tipo = S.lock || (m.tipo === 'medical' ? '' : m.tipo) || S.tipo; S.ck = d.ck || {}; $('tel').value = d.tel || $('tel').value || ''; $('vm').value = d.veh || ''; $('mat').value = d.mat || ''; $('pl').value = d.plazas == null ? '' : d.plazas; $('obs').value = d.obs || ''; renderList();
+function fill(m) { var d = m.datos || {}; S.tipo = S.lock || (m.tipo === 'medical' ? '' : m.tipo) || S.tipo; S.ck = d.ck || {}; S.vie = d.vie || ''; paintVie(); $('tel').value = d.tel || $('tel').value || ''; $('vm').value = d.veh || ''; $('mat').value = d.mat || ''; $('pl').value = d.plazas == null ? '' : d.plazas; $('obs').value = d.obs || ''; renderList();
  var f = String(m.actualizado || '').match(/(\d{4})-(\d\d)-(\d\d)\s+(\d\d:\d\d)/);
  $('prev').innerHTML = '✓ <b>Ya contestaste' + (f ? ' el ' + f[3] + '/' + f[2] + ' a las ' + f[4] : '') + '.</b> Puedes cambiar lo que quieras y volver a enviar.'; $('prev').hidden = false; }
 
 $('send').addEventListener('click', async function () {
  var nombre = S.id ? S.nombre : $('nom').value.trim(), id = S.id || (nombre ? 'm-' + MB.slug(nombre) : '');
  var falta = [];
- if (!nombre) falta.push('tu nombre'); if (!$('tel').value.trim()) falta.push('el teléfono'); if (!S.tipo) falta.push('cómo vas');
+ if (!nombre) falta.push('tu nombre'); if (!$('tel').value.trim()) falta.push('el teléfono'); if (!S.vie) falta.push('a qué hora puedes estar el viernes'); if (!S.tipo) falta.push('cómo vas');
  var sin = itemsOf(S.tipo).filter(function (x) { return !S.ck[x[0]]; }).length; if (sin) falta.push(sin + (sin === 1 ? ' punto' : ' puntos') + ' de la lista');
  if (falta.length) { $('miss').textContent = 'Falta: ' + falta.join(', ') + '.'; $('miss').hidden = false; return; }
  var ck = {}; itemsOf(S.tipo).forEach(function (x) { ck[x[0]] = S.ck[x[0]]; });
- var datos = { tel: $('tel').value.trim(), veh: $('vm').value.trim(), mat: $('mat').value.trim().toUpperCase(), plazas: S.tipo === 'moto' ? null : ($('pl').value === '' ? null : +$('pl').value), ck: ck, obs: $('obs').value.trim(), lista: !S.id ? 'añadido por el marshal' : '' };
+ var datos = { vie: S.vie, tel: $('tel').value.trim(), veh: $('vm').value.trim(), mat: $('mat').value.trim().toUpperCase(), plazas: S.tipo === 'moto' ? null : ($('pl').value === '' ? null : +$('pl').value), ck: ck, obs: $('obs').value.trim(), lista: !S.id ? 'añadido por el marshal' : '' };
  this.disabled = true; this.textContent = 'Guardando…';
  try { await MB.call('mar.set', { id: id, nombre: nombre, tipo: S.tipo, datos: datos }); done(nombre); resumen(); }
  catch (err) { MB.toast('No se ha podido guardar. Prueba otra vez.'); }
