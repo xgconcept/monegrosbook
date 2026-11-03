@@ -437,7 +437,7 @@ function renderMar(){
  const nop=lista.filter(p=>{const a=asg[p.id]||{},c=a.conf||{},its=(a.items||[]).filter(i=>!i.resp);return its.length&&its.every(i=>c[i.area+"|"+i.dia]==="no");});
  const sin=lista.filter(p=>!MAR[p.id]&&!nop.includes(p));
  const cam=resp.filter(r=>(r.datos||{}).cambio);
- const tip={moto:0,coche:0,medical:0}; resp.forEach(r=>{if(tip[r.tipo]!=null)tip[r.tipo]++;});
+ const tip={moto:0,coche:0,medical:0}; resp.forEach(r=>{if(tip[r.tipo]!=null&&!(r.datos||{}).pco)tip[r.tipo]++;});
  const falta={}; resp.forEach(r=>{const ck=(r.datos||{}).ck||{};Object.keys(ck).forEach(k=>{if(ck[k]==="si")return;(falta[k]=falta[k]||{pide:[],no:[]})[ck[k]==="pide"?"pide":"no"].push(r.nombre);});});
  const plz=resp.reduce((s,r)=>s+((r.datos||{}).plazas||0),0);
  const vbox=Object.keys(MAR_VIE).map(k=>{const n=resp.filter(r=>(r.datos||{}).vie===k).map(r=>r.nombre);const rs=resp.filter(r=>(r.datos||{}).vie===k);return rs.length?`<li${k==="no"?' style="color:#b3261e"':""}><b>${MAR_VIE[k]}</b> · ${rs.length}: ${esc(rs.map(r=>r.nombre+((r.datos||{}).vieh?" ("+(r.datos||{}).vieh+")":"")).join(", "))}</li>`:"";}).join("");
@@ -445,7 +445,7 @@ function renderMar(){
  const fl=Object.keys(falta).sort((a,b)=>(falta[b].pide.length+falta[b].no.length)-(falta[a].pide.length+falta[a].no.length)).map(k=>{const f=falta[k];
   return `<li><b>${esc(MAR_IT[k]||k)}</b>${f.pide.length?` <span class="tu tu-man">necesitan que se lo demos · ${f.pide.length}</span> ${esc(f.pide.join(", "))}`:""}${f.no.length?` <span class="tu tu-no">no tienen · ${f.no.length}</span> ${esc(f.no.join(", "))}`:""}</li>`;}).join("");
  const rows=resp.map(r=>{const d=r.datos||{},ck=d.ck||{};const bad=Object.keys(ck).filter(k=>ck[k]!=="si");
-  return `<tr><td><b>${esc(r.nombre)}</b>${d.lista?' <span class="tu tu-man">no estaba en la lista</span>':""}<div class="ms">${esc(r.actualizado||"")}</div></td><td>${MAR_TIPO[r.tipo]||esc(r.tipo==="pco"?"PCO":r.tipo)}${d.cambio?` <span class="tu tu-no">CAMBIO: era ${esc(d.cambio.split(">")[0])}</span>`:""}</td><td>${d.vie?esc(MAR_VIE[d.vie]||d.vie)+(d.vieh?' · '+esc(d.vieh):''):'<span class="ms">—</span>'}</td>
+  return `<tr><td><b>${esc(r.nombre)}</b>${d.lista?' <span class="tu tu-man">no estaba en la lista</span>':""}<div class="ms">${esc(r.actualizado||"")}</div></td><td>${(r.datos||{}).pco?"<b>PCO</b>":(MAR_TIPO[r.tipo]||esc(r.tipo))}${d.cambio?` <span class="tu tu-no">CAMBIO: era ${esc(d.cambio.split(">")[0])}</span>`:""}</td><td>${d.vie?esc(MAR_VIE[d.vie]||d.vie)+(d.vieh?' · '+esc(d.vieh):''):'<span class="ms">—</span>'}</td>
   <td>${d.tel?`<a href="tel:${esc(d.tel)}">${esc(d.tel)}</a>`:""}</td><td>${esc(d.veh||"")}${d.mat?` · <span class="ms">${esc(d.mat)}</span>`:""}${d.plazas!=null?` · ${d.plazas} plazas`:""}</td>
   <td>${bad.length?bad.map(k=>`<span class="tu ${ck[k]==="pide"?"tu-man":"tu-no"}">${esc(MAR_IT[k]||k)}${ck[k]==="pide"?" · dárselo":""}</span>`).join(" "):'<span class="tu">Todo OK</span>'}</td><td>${esc(d.obs||"")}</td></tr>`;}).join("");
  return `<style>.mkp{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}.mk{background:var(--paper,#fff);border:1px solid rgba(0,0,0,.12);border-radius:8px;padding:8px 12px;min-width:110px}.mk b{display:block;font:800 26px/1 "Barlow Condensed",sans-serif}.mk span{font-size:12px;opacity:.75}.mk.warn b{color:#b3261e}
