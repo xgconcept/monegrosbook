@@ -268,9 +268,9 @@ $('send').addEventListener('click', async function () {
  var sin = itemsOf(S.tipo).filter(function (x) { return !S.ck[x[0]]; }).length; if (sin) falta.push(sin + (sin === 1 ? ' punto' : ' puntos') + ' de la lista');
  if (falta.length) { $('miss').textContent = 'Falta: ' + falta.join(', ') + '.'; $('miss').hidden = false; return; }
  var ck = {}; itemsOf(S.tipo).forEach(function (x) { ck[x[0]] = S.ck[x[0]]; });
- var datos = { vie: S.vie, vieh: S.vie === 'no' ? $('vieh').value.trim() : '', tel: $('tel').value.trim(), veh: $('vm').value.trim(), mat: $('mat').value.trim().toUpperCase(), plazas: S.tipo === 'moto' ? null : ($('pl').value === '' ? null : +$('pl').value), ck: ck, obs: $('obs').value.trim(), lista: !S.id ? 'añadido por el marshal' : '', cambio: (S.orig && S.orig !== 'medical' && S.tipo !== S.orig) ? S.orig + '>' + S.tipo : '' };
+ var datos = { vie: S.vie, vieh: S.vie === 'no' ? $('vieh').value.trim() : '', tel: $('tel').value.trim(), veh: $('vm').value.trim(), mat: $('mat').value.trim().toUpperCase(), plazas: S.tipo === 'moto' ? null : ($('pl').value === '' ? null : +$('pl').value), ck: ck, obs: $('obs').value.trim(), lista: !S.id ? 'añadido por el marshal' : '', cambio: (S.orig && S.orig !== 'medical' && S.tipo !== S.orig) ? S.orig + '>' + S.tipo : '', pco: S.tipo === 'pco' };
  this.disabled = true; this.textContent = 'Guardando…';
- try { await MB.call('mar.set', { id: id, nombre: nombre, tipo: S.tipo, datos: datos }); done(nombre); resumen(); }
+ try { await MB.call('mar.set', { id: id, nombre: nombre, tipo: S.tipo === 'pco' ? 'moto' : S.tipo, datos: datos }); done(nombre); resumen(); }
  catch (err) { MB.toast('No se ha podido guardar. Prueba otra vez.'); }
  finally { this.disabled = false; this.textContent = 'Enviar y entrar al grupo'; }
 });
