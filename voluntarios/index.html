@@ -434,7 +434,8 @@ function renderMar(){
  const lista=[]; Object.keys(asg).forEach(id=>{const a=asg[id];const its=(a.items||[]).filter(i=>MAR_AREAS.includes(i.area)&&(i.dia==="sab"||i.area==="A21")&&!/^PCO\b/.test(i.puesto||""));if(its.length)lista.push({id,nombre:a.nombre||id,areas:[...new Set(its.map(i=>i.area))].join(" · "),pu:its.map(i=>i.puesto||"").filter(Boolean).join(" · ")});});
  lista.sort((a,b)=>a.nombre.localeCompare(b.nombre,"es"));
  const resp=Object.keys(MAR).map(id=>Object.assign({id},MAR[id])).sort((a,b)=>String(b.actualizado).localeCompare(String(a.actualizado)));
- const sin=lista.filter(p=>!MAR[p.id]);
+ const nop=lista.filter(p=>{const a=asg[p.id]||{},c=a.conf||{},its=(a.items||[]).filter(i=>!i.resp);return its.length&&its.every(i=>c[i.area+"|"+i.dia]==="no");});
+ const sin=lista.filter(p=>!MAR[p.id]&&!nop.includes(p));
  const tip={moto:0,coche:0,medical:0}; resp.forEach(r=>{if(tip[r.tipo]!=null)tip[r.tipo]++;});
  const falta={}; resp.forEach(r=>{const ck=(r.datos||{}).ck||{};Object.keys(ck).forEach(k=>{if(ck[k]==="si")return;(falta[k]=falta[k]||{pide:[],no:[]})[ck[k]==="pide"?"pide":"no"].push(r.nombre);});});
  const plz=resp.reduce((s,r)=>s+((r.datos||{}).plazas||0),0);
@@ -453,6 +454,7 @@ function renderMar(){
  <div class="mbox"><h3>Viernes 6: a qué hora llegan</h3>${vbox?`<ul>${vbox}</ul>`:'<p class="ms">Nadie ha contestado todavía.</p>'}</div>
  <div class="mbox"><h3>Lo que hay que conseguir</h3>${fl?`<ul>${fl}</ul>`:'<p class="ms">Nadie ha marcado que le falte nada.</p>'}</div>
  <div class="mbox"><h3>Respuestas (${resp.length})</h3>${rows?`<div class="mscroll"><table class="mt"><thead><tr><th>Marshal</th><th>Va en</th><th>Viernes</th><th>Teléfono</th><th>Vehículo</th><th>Le falta</th><th>Notas</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<p class="ms">Todavía no ha contestado nadie.</p>'}</div>
+ <div class="mbox"><h3>No pueden venir (${nop.length})</h3>${nop.length?`<ul>${nop.map(p=>`<li>${esc(p.nombre)} <span class="ms">${esc(p.areas)}${p.pu?" · "+esc(p.pu):""}</span></li>`).join("")}</ul>`:'<p class="ms">Nadie ha avisado de que no puede.</p>'}</div>
  <div class="mbox"><h3>Sin contestar (${sin.length})</h3>${sin.length?`<ul>${sin.map(p=>`<li>${esc(p.nombre)} <span class="ms">${esc(p.areas)}${p.pu?" · "+esc(p.pu):""}</span></li>`).join("")}</ul>`:'<p class="ms">Han contestado todos.</p>'}
  <p class="ms" style="margin-top:8px">Formulario que ven ellos: <a href="../marshals/" target="_blank" rel="noopener">xgconcept.github.io/monegrosbook/marshals</a> (clave MB26). Salen en la lista los de ${MAR_AREAS.join(", ")}.</p></div>`;
 }
