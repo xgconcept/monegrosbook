@@ -53,7 +53,7 @@ i.d.no{background:#b3261e}
 .cf.pu{background:#FABD12;color:#231a00;border:1px solid #d9a20a;text-transform:none;margin-right:6px}.cf.ok{background:#dcf3e7;color:#1d8a55;border:1px solid #1d8a55}
 @media (prefers-color-scheme: dark){.shift.asg .hrs{color:#FABD12}}
 .hz{display:block;font-size:13px;line-height:1.35;margin:4px 0 2px;color:var(--ink,#0d1b2a)}.hz b{font-weight:700}.hz small{color:var(--sub,#5b6878);font-size:12px}
-</style></head><body>
+.card .nop{padding:10px 16px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,0,0,.12);font-size:13px;opacity:.95}.nopb{min-height:44px;padding:8px 14px;border-radius:8px;border:1.5px solid #b3261e;background:transparent;color:#b3261e;font-weight:700;font-size:14px;font-family:inherit;cursor:pointer}.nopb:disabled{opacity:.5}.nop.done{color:#b3261e;font-weight:600}</style></head><body>
 <title>MonegrosBook · Tablón del equipo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="../assets/mb.css">
@@ -553,6 +553,16 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
  var FIESTA={plato:'menú típico de la tierra (nombre por confirmar)',hora:'13:00',donde:'Pabellón, mesas del tardeo'};
  var FIESTA_LI='<li class="shift fiesta"><div class="dy"><b>DOM</b><span>8 nov</span></div><div class="tm"><div class="aname2">Comida final del equipo</div><div class="hrs">'+FIESTA.hora+'</div></div><div class="wh"><span class="cg tk">¡Estás invitado/a! La fiesta final para todos: '+esc(FIESTA.plato)+' · '+esc(FIESTA.donde)+'.</span><span class="fz">Por la mañana desmontamos (desde las 08:00): si quieres echar una mano, genial, pero <b>no es obligatorio</b>. A la comida venid todos.</span>'+'{{CB}}'+'</div></li>';
  var PEND={}, LAST=null;
+ function nopHtml(p,vol,nNo){ if(!vol.length) return ''; if(nNo===vol.length) return '<div class="nop done">Nos has avisado de que no puedes asistir. Gracias, ya no contamos contigo.</div>'; return '<div class="nop"><button type="button" class="nopb" data-id="'+p.id+'">No puedo asistir</button><span>Si no vas a poder venir, pulsa aquí. No hace falta que expliques el motivo.</span></div>'; }
+ document.addEventListener('click',async function(e){var b=e.target.closest('.nopb');if(!b)return;e.preventDefault();
+  if(!window.confirm('¿Confirmas que no puedes asistir al evento? Quitaremos todos tus puestos y contaremos con otra persona. No hace falta que des explicaciones.'))return;
+  var id=b.dataset.id,p=((LAST&&LAST.people)||[]).filter(function(q){return q.id===id;})[0];if(!p)return;b.disabled=true;
+  var ks=p.items.filter(function(i){return !i.resp;}).map(function(i){return i.area+'|'+i.dia;});
+  try{ for(var n=0;n<ks.length;n++){ await MB.call('asig.conf',{id:id,k:ks[n],v:'no'}); }
+   var c=p.conf||{};if(typeof c==='string'){try{c=JSON.parse(c||'{}');}catch(_){c={};}} ks.forEach(function(k){c[k]='no';}); p.conf=c;
+   build(LAST); if(MB.toast) MB.toast('Guardado · gracias por avisar');
+  }catch(err){ b.disabled=false; if(MB.toast) MB.toast('No se ha podido guardar. Prueba otra vez.'); }
+ });
  var WA='https://wa.me/34643455398';
  // caja de confirmación de cada área: el voluntario clica y se guarda en su fila (asig.conf)
  // turnos (01/11): donde pone «son muchas horas» (menos marshals de ruta A19/A21 y quien ya tiene un puesto con hora) el voluntario elige todo / turno 1 / turno 2 → conf["A01|vie|t"]="todo"|"man"(turno 1)|"tar"(turno 2); corte en la mitad, redondeado a la media hora
@@ -641,7 +651,7 @@ table.vac td{padding:8px 12px;border-top:1px solid var(--hair);vertical-align:mi
     its.map(function(i){var a=A[i.area]||{n:i.area,g:''},dd=DAY[i.dia]||['—',''],pend=!(i.resp||i.conf)&&i.st!=='no';
      var H=HOR[i.area]; if(!H) return '<li class="shift'+(pend?' pend':'')+'"><div class="dy"><b>'+dd[0]+'</b><span>'+dd[1]+'</span></div><div class="tm"><div class="time word tbc">'+(i.dia==='all'?'Todo el evento':'Hora por confirmar')+'</div></div>'+'<div class="wh"><span class="ar">'+esc(i.area)+' · '+esc(a.n)+'</span><span class="cg">'+(i.resp?'Responsable del área':'Voluntario')+'</span>'+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';
      return '<li class="shift asg'+(pend?' pend':'')+(i.st==='no'?' no':'')+'"><div class="dy"><b>'+dd[0]+'</b><span>'+dd[1]+'</span></div><div class="tm"><button type="button" class="aname2 aopen" data-area="'+esc(i.area)+'" title="Ver quién está en esta área">'+esc(a.n)+' <span class="aw">Ver equipo →</span></button><div class="hrs">'+esc(hrsOf(i))+'</div></div>'+
-      '<div class="wh"><span class="cg tk">'+esc(H[1])+'</span>'+(i.pu?'<span class="cf pu">Tu puesto: <b>'+esc(i.pu)+'</b></span>':'')+(i.resp||i.resp2?'<span class="cf rs">Responsable del área</span>':'')+(!i.resp&&!i.resp2&&LONG[i.area]&&!SHORTD[i.area+'|'+i.dia]&&!tsplit(i)?'<span class="rot"><b class="rk">Son muchas horas.</b> Cuando tengamos a todo el equipo disponible y confirmado, el responsable del área repartirá <b>turnos y rotaciones</b>.</span>':'')+'<span class="ar">'+esc(i.area)+'</span>'+(i.resp?'':cbox(p,i.area+'|'+i.dia,i.st,0,tsplit(i)))+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';}).join('')+fiestaLi(p)+'</ol></article>';}).join('')
+      '<div class="wh"><span class="cg tk">'+esc(H[1])+'</span>'+(i.pu?'<span class="cf pu">Tu puesto: <b>'+esc(i.pu)+'</b></span>':'')+(i.resp||i.resp2?'<span class="cf rs">Responsable del área</span>':'')+(!i.resp&&!i.resp2&&LONG[i.area]&&!SHORTD[i.area+'|'+i.dia]&&!tsplit(i)?'<span class="rot"><b class="rk">Son muchas horas.</b> Cuando tengamos a todo el equipo disponible y confirmado, el responsable del área repartirá <b>turnos y rotaciones</b>.</span>':'')+'<span class="ar">'+esc(i.area)+'</span>'+(i.resp?'':cbox(p,i.area+'|'+i.dia,i.st,0,tsplit(i)))+(a.g?'<div class="lk"><button type="button" class="pdf" data-code="'+esc(i.area)+'" data-g="'+esc(a.g)+'">'+lockHtml(i.area)+'</button></div>':'')+'</div></li>';}).join('')+fiestaLi(p)+'</ol>'+nopHtml(p,vol,nNo)+'</article>';}).join('')
    :'<p class="empty" style="display:block">Todavía no hay nadie asignado.</p>';
   if(window.MBsearch) window.MBsearch();
   var lv=document.getElementById('live'); if(lv) lv.textContent='en vivo · '+MB.hm(d.ts);
